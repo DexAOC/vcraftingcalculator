@@ -7,7 +7,7 @@
         "image": "imagens/madeira.jpg",
         "type": "Coletável",
         "origin": "Coletada ao cortar árvores",
-        "crafting": null
+        "crafting": []
       },
       {
         "id": "fibra_vegetal",
@@ -16,7 +16,7 @@
         "image": "imagens/fibra_vegetal.jpg",
         "type": "Coletável",
         "origin": "Coletada ao cortar arbustos",
-        "crafting": null
+        "crafting": []
       },
       {
         "id": "serragem",
@@ -59,6 +59,42 @@
             { "item": "linha grossa", "quantity": 4 }
           ]
         }
+      },
+      {
+        "id": "linha grossa",
+        "name": "Linha Grossa",
+        "description": "Componentes de alfaiataria são usados para fabricar roupas, armaduras e capas.",
+        "image": "imagens/linha_grossa.jpg",
+        "type": "Recurso",
+        "origin": "São produzidos em um Tear.",
+        "crafting": {
+          "materials": [
+            { "item": "fibra_vegetal", "quantity": 8 },
+            { "item": "polen", "quantity": 4 }
+          ]
+        }
+      },
+      {
+        "id": "polen",
+        "name": "Pólen",
+        "description": "Um pó útil para tingir e fortalecer linhas e tecidos.",
+        "image": "imagens/polen.jpg",
+        "type": "Recurso",
+        "origin": "Refinado em um Triturador.",
+        "crafting": {
+          "materials": [
+            { "item": "qualquer_flor", "quantity": 15 }
+          ]
+        }
+      },
+      {
+        "id": "qualquer_flor",
+        "name": "Qualquer Flor",
+        "description": "Um pó útil para tingir e fortalecer linhas e tecidos.",
+        "image": "imagens/qualquer_flor.jpg",
+        "type": "Coletável",
+        "origin": "Coletada ao cortar flores",
+        "crafting": []
       }
     ]
   }
