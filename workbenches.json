@@ -1,0 +1,22 @@
+{
+  "workbenches": [
+    {
+      "id": "serraria",
+      "name": "Serraria",
+      "description": "A bancada para processar madeira e produzir serragem.",
+      "image": "imagens/serraria.jpg"
+    },
+    {
+      "id": "prensa_de_papel",
+      "name": "Prensa de Papel",
+      "description": "Bancada para transformar serragem e fibras em papel e pergaminho.",
+      "image": "imagens/prensa_de_papel.jpg"
+    },
+    {
+      "id": "fornalha",
+      "name": "Fornalha",
+      "description": "Bancada para fundir minérios e criar metais.",
+      "image": "imagens/fornalha.jpg"
+    }
+  ]
+}

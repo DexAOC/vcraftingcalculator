@@ -37,6 +37,7 @@
       background-color: var(--bg);
       color: var(--text);
       transition: background-color 0.3s, color 0.3s;
+      position: relative;
     }
 
     .sidebar {
@@ -46,6 +47,7 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+      overflow-y: auto;
     }
     .sidebar h2 {
       color: white;
@@ -78,6 +80,7 @@
       padding: 30px;
       overflow-y: auto;
       max-width: 700px;
+      position: relative;
     }
     .main-content h1 {
       font-size: 32px;
@@ -140,6 +143,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      position: relative;
     }
     .result-container h2 {
       margin-bottom: 15px;
@@ -153,6 +157,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      position: relative;
     }
     .result-container li img {
       width: 20px;
@@ -177,6 +182,67 @@
       cursor: pointer;
     }
 
+    /* Bancada links */
+    a.workstation-link {
+      color: var(--hover);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    a.workstation-link:hover {
+      color: #16a085;
+    }
+
+    /* Página bancada */
+    .workstation-page {
+      max-width: 700px;
+      background: var(--detail-bg);
+      color: var(--detail-text);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      margin-top: 20px;
+    }
+    .workstation-page img {
+      max-width: 150px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: block;
+    }
+    .workstation-page h2 {
+      margin-bottom: 10px;
+    }
+    .workstation-page h3 {
+      margin-top: 15px;
+    }
+    .workstation-page ul {
+      list-style: disc inside;
+      margin-left: 10px;
+    }
+
+    /* Tooltip bancada */
+    #tooltip-workstation {
+      position: absolute;
+      pointer-events: none;
+      background: var(--detail-bg);
+      color: var(--detail-text);
+      border: 1px solid var(--hover);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: nowrap;
+      z-index: 9999;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    #tooltip-workstation img {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      object-fit: contain;
+    }
+
     @media (max-width: 768px) {
       body {
         flex-direction: column;
@@ -189,231 +255,289 @@
         justify-content: space-around;
       }
       .menu-button, .theme-toggle {
-        flex: 1 1 45%;
-        margin-bottom: 10px;
+        flex: 1 1 auto;
+        margin: 5px;
+        text-align: center;
       }
       .main-content {
-        padding: 20px;
         max-width: 100%;
-      }
-      .item-image {
-        float: none;
-        display: block;
-        margin: 0 auto 15px auto;
+        padding: 15px;
       }
     }
   </style>
 </head>
 <body>
+  <aside class="sidebar" aria-label="Menu de navegação">
+    <h2>Bancadas</h2>
+    <div id="workbench-list">
+      <!-- Lista de bancadas preenchida por JS -->
+    </div>
+    <button class="theme-toggle" aria-pressed="false">Modo Escuro</button>
+  </aside>
 
-  <div class="sidebar">
-    <h2>Calculadora V Rising</h2>
-    <button class="menu-button" data-content="home" aria-pressed="true"><i data-lucide="castle"></i> Início</button>
-    <button class="menu-button" data-content="calculator" aria-pressed="false"><i data-lucide="tool"></i> Calculadora</button>
-    <button class="menu-button" data-content="comingsoon" aria-pressed="false"><i data-lucide="clock"></i> EM BREVE</button>
-    <button class="theme-toggle" id="toggleTheme" aria-pressed="false">Tema Escuro</button>
-  </div>
+  <main class="main-content" tabindex="0">
+    <h1>Calculadora de Crafting - V Rising</h1>
+    <label for="item-select">Escolha o item:</label>
+    <input type="text" id="item-select" placeholder="Digite o nome do item..." autocomplete="off" />
+    <ul id="suggestions"></ul>
 
-  <div class="main-content" id="main">
-    <h1>Bem-vindo à Calculadora V Rising</h1>
-    <p>Selecione uma opção no menu à esquerda para começar.</p>
-  </div>
+    <label for="quantity">Quantidade:</label>
+    <input type="number" id="quantity" value="1" min="1" />
+
+    <button class="calculate-btn">Calcular Materiais</button>
+
+    <div id="result" class="result-container" aria-live="polite"></div>
+
+    <div id="workstation-page" class="workstation-page" style="display:none;"></div>
+  </main>
+
+  <div id="tooltip-workstation" role="tooltip" aria-hidden="true"></div>
 
   <script>
-    lucide.createIcons();
     let itemData = [];
+    let workstations = {};
+    let selectedItem = null;
+    const itemSelect = document.getElementById('item-select');
+    const quantityInput = document.getElementById('quantity');
+    const suggestionsList = document.getElementById('suggestions');
+    const resultDiv = document.getElementById('result');
+    const workbenchListDiv = document.getElementById('workbench-list');
+    const workstationPageDiv = document.getElementById('workstation-page');
+    const tooltip = document.getElementById('tooltip-workstation');
+    const themeToggleBtn = document.querySelector('.theme-toggle');
 
-    const buttons = document.querySelectorAll('.menu-button');
-    const main = document.getElementById('main');
-    const themeBtn = document.getElementById('toggleTheme');
+    // Carrega dados dos arquivos JSON
+    async function loadData() {
+      try {
+        const itemsResp = await fetch('items.json');
+        const itemsJson = await itemsResp.json();
+        itemData = itemsJson.items;
 
-    function updateThemeLabel(theme) {
-      themeBtn.textContent = theme === "dark" ? "Tema Claro" : "Tema Escuro";
-      themeBtn.setAttribute('aria-pressed', theme === "dark" ? "true" : "false");
-    }
-    function applyTheme(theme) {
-      document.documentElement.setAttribute("data-theme", theme);
-      updateThemeLabel(theme);
-    }
-    const savedTheme = localStorage.getItem("theme") || "light";
-    applyTheme(savedTheme);
+        const wbResp = await fetch('workbenches.json');
+        const wbJson = await wbResp.json();
 
-    themeBtn.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute("data-theme");
-      const newTheme = currentTheme === "dark" ? "light" : "dark";
-      applyTheme(newTheme);
-      localStorage.setItem("theme", newTheme);
-    });
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        const content = btn.getAttribute('data-content');
-        if(content === "home") showHome();
-        else if(content === "calculator") showCalculator();
-        else if(content === "comingsoon") showComingSoon();
-      });
-    });
-
-    function showHome() {
-      main.innerHTML = `
-        <h1>Bem-vindo à Calculadora V Rising</h1>
-        <p>Selecione uma opção no menu à esquerda para começar.</p>
-      `;
-      lucide.createIcons();
-    }
-
-    function showComingSoon() {
-      main.innerHTML = `
-        <h1>Em Breve</h1>
-        <p>Novas funcionalidades estão a caminho. Fique ligado!</p>
-      `;
-      lucide.createIcons();
-    }
-
-    function renderMaterials(materials, quantity, depth = 0) {
-      if (!materials || materials.length === 0) return "<p>Este item não requer materiais para crafting.</p>";
-      let listHTML = "<ul>";
-      materials.forEach(mat => {
-        const matItem = itemData.find(i => i.id === mat.item);
-        const totalQty = mat.quantity * quantity;
-        const imgHTML = matItem?.image ? `<img src="${matItem.image}" alt="${matItem.name}">` : "";
-        const hasSub = matItem?.crafting?.materials?.length > 0;
-        const btnHTML = hasSub ? `<button class="expand-btn" data-item="${matItem.id}" data-qty="${totalQty}" data-depth="${depth + 1}" style="margin-left:6px;">+</button>` : "";
-        const nestedId = `nested-${matItem?.id}-${depth + 1}`;
-        listHTML += `
-          <li style="margin-left:${depth * 20}px;">
-            ${imgHTML}${totalQty}x ${matItem ? matItem.name : mat.item}
-            ${btnHTML}
-            <div id="${nestedId}" class="nested" style="margin-top:6px;"></div>
-          </li>
-        `;
-      });
-      listHTML += "</ul>";
-      return listHTML;
-    }
-
-    function attachExpandListeners(container) {
-      container.querySelectorAll('.expand-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const itemId = btn.getAttribute('data-item');
-          const qty = parseInt(btn.getAttribute('data-qty'));
-          const depth = parseInt(btn.getAttribute('data-depth'));
-          const targetDiv = document.getElementById(`nested-${itemId}-${depth}`);
-          const item = itemData.find(i => i.id === itemId);
-          if (!targetDiv || !item?.crafting?.materials?.length) return;
-          if (targetDiv.innerHTML.trim() === "") {
-            targetDiv.innerHTML = renderMaterials(item.crafting.materials, qty, depth);
-            btn.textContent = "−";
-            attachExpandListeners(targetDiv);
-          } else {
-            targetDiv.innerHTML = "";
-            btn.textContent = "+";
-          }
+        workstations = {};
+        wbJson.workbenches.forEach(wb => {
+          workstations[wb.id] = wb;
         });
+
+        populateWorkbenchSidebar();
+        setupAutocomplete();
+      } catch (e) {
+        alert('Erro ao carregar dados: ' + e);
+      }
+    }
+
+    // Preenche a sidebar com as bancadas como botões
+    function populateWorkbenchSidebar() {
+      workbenchListDiv.innerHTML = '';
+      Object.values(workstations).forEach(wb => {
+        const btn = document.createElement('button');
+        btn.className = 'menu-button';
+        btn.textContent = wb.name;
+        btn.setAttribute('data-id', wb.id);
+        btn.setAttribute('aria-pressed', 'false');
+        btn.addEventListener('click', () => showWorkbenchPage(wb.id));
+        workbenchListDiv.appendChild(btn);
       });
     }
 
-    function showCalculator() {
-      let html = `
-        <h1>Calculadora de Crafting</h1>
-        <label for="itemSearch">Digite o nome do item:</label>
-        <input type="text" id="itemSearch" autocomplete="off" />
-        <ul id="suggestions" style="display:none;"></ul>
+    // Exibe a página dedicada da bancada selecionada
+    function showWorkbenchPage(id) {
+      // Desmarca botões
+      document.querySelectorAll('.menu-button').forEach(btn => {
+        btn.setAttribute('aria-pressed', 'false');
+      });
 
-        <label for="quantityInput">Quantidade desejada:</label>
-        <input type="number" id="quantityInput" min="1" value="1" />
-        <button class="calculate-btn" id="calculateBtn">Calcular materiais</button>
+      // Marca botão atual
+      const currentBtn = [...document.querySelectorAll('.menu-button')].find(b => b.getAttribute('data-id') === id);
+      if (currentBtn) currentBtn.setAttribute('aria-pressed', 'true');
 
-        <div class="result-container" id="result" style="display:none;"></div>
+      const wb = workstations[id];
+      if (!wb) return;
+
+      // Filtra itens que usam essa bancada como workstation
+      const producedItems = itemData.filter(i => i.workstation === id);
+
+      // Filtra itens que usam essa bancada como origin (exemplo, aqui só como placeholder)
+      // Como não temos dados específicos, vamos mostrar somente produzidos
+      workstationPageDiv.innerHTML = `
+        <img src="${wb.image}" alt="Imagem da bancada ${wb.name}" />
+        <h2>${wb.name}</h2>
+        <p>${wb.description}</p>
+
+        <h3>Itens produzidos:</h3>
+        <ul>
+          ${producedItems.length > 0 ? producedItems.map(i => `<li><img src="${i.image}" alt="${i.name}" /> ${i.name}</li>`).join('') : '<li>Nenhum item encontrado.</li>'}
+        </ul>
       `;
-      main.innerHTML = html;
-      lucide.createIcons();
+      workstationPageDiv.style.display = 'block';
+      resultDiv.style.display = 'none';
+    }
 
-      const itemSearch = document.getElementById('itemSearch');
-      const suggestions = document.getElementById('suggestions');
-      const quantityInput = document.getElementById('quantityInput');
-      const calculateBtn = document.getElementById('calculateBtn');
-      const result = document.getElementById('result');
+    // Setup do autocomplete para o input de item
+    function setupAutocomplete() {
+      itemSelect.addEventListener('input', () => {
+        const query = itemSelect.value.toLowerCase();
+        suggestionsList.innerHTML = '';
 
-      let selectedItem = null;
-
-      itemSearch.addEventListener('input', () => {
-        const term = itemSearch.value.toLowerCase().trim();
-        suggestions.innerHTML = '';
-        selectedItem = null;
-
-        if (term.length < 2) {
-          suggestions.style.display = 'none';
+        if (query.length === 0) {
+          selectedItem = null;
           return;
         }
 
-        const filtered = itemData.filter(item => item.name.toLowerCase().includes(term));
+        const filtered = itemData.filter(i => i.name.toLowerCase().includes(query)).slice(0, 10);
 
-        filtered.forEach(item => {
+        filtered.forEach(i => {
           const li = document.createElement('li');
-          li.innerHTML = `
-            <img src="${item.image || 'https://via.placeholder.com/24'}" style="width:24px;height:24px;margin-right:8px;border-radius:4px;vertical-align:middle;" />
-            <span>${item.name}</span>
-          `;
+          li.textContent = i.name;
+          li.tabIndex = 0;
           li.addEventListener('click', () => {
-            itemSearch.value = item.name;
-            selectedItem = item;
-            suggestions.innerHTML = '';
-            suggestions.style.display = 'none';
+            selectItem(i);
           });
-          suggestions.appendChild(li);
+          li.addEventListener('keydown', e => {
+            if (e.key === 'Enter') selectItem(i);
+          });
+          suggestionsList.appendChild(li);
         });
-
-        suggestions.style.display = filtered.length > 0 ? 'block' : 'none';
       });
 
-      document.addEventListener('click', (e) => {
-        if (!suggestions.contains(e.target) && e.target !== itemSearch) {
-          suggestions.style.display = 'none';
+      // Fecha sugestões ao clicar fora
+      document.addEventListener('click', e => {
+        if (!itemSelect.contains(e.target) && !suggestionsList.contains(e.target)) {
+          suggestionsList.innerHTML = '';
         }
-      });
-
-      calculateBtn.addEventListener('click', () => {
-        const quantity = Math.max(1, parseInt(quantityInput.value) || 1);
-        quantityInput.value = quantity;
-
-        if (!selectedItem) {
-          alert("Por favor, selecione um item da lista.");
-          return;
-        }
-
-        const materials = renderMaterials(selectedItem.crafting?.materials || [], quantity);
-
-        result.style.display = "block";
-        result.innerHTML = `
-          <h2>${selectedItem.name} (x${quantity})</h2>
-          <img src="${selectedItem.image || 'https://via.placeholder.com/80?text=No+Image'}" alt="${selectedItem.name}" class="item-image" />
-          <p><strong>Descrição:</strong> ${selectedItem.description}</p>
-          <p><strong>Tipo:</strong> ${selectedItem.type}</p>
-          <p><strong>Origem:</strong> ${selectedItem.origin}</p>
-          <h3>Materiais necessários:</h3>
-          ${materials}
-        `;
-
-        attachExpandListeners(result);
-        result.scrollIntoView({ behavior: "smooth" });
       });
     }
 
-    main.innerHTML = '<p>Carregando items...</p>';
+    // Seleciona um item da lista
+    function selectItem(item) {
+      selectedItem = item;
+      itemSelect.value = item.name;
+      suggestionsList.innerHTML = '';
+      resultDiv.style.display = 'block';
+      workstationPageDiv.style.display = 'none';
+      renderResult();
+    }
 
-    fetch('items.json')
-      .then(response => response.json())
-      .then(json => {
-        itemData = json.items || [];
-        showHome();
-      })
-      .catch(error => {
-        console.error("Erro ao carregar items.json:", error);
-        main.innerHTML = `<p style="color: red;">Erro ao carregar os dados dos items.</p>`;
+    // Renderiza o resultado da receita
+    function renderResult() {
+      if (!selectedItem) {
+        resultDiv.innerHTML = '';
+        return;
+      }
+
+      const qty = parseInt(quantityInput.value) || 1;
+      const item = selectedItem;
+
+      let html = `
+        <h2>Receita para ${qty}x ${item.name}</h2>
+        <img src="${item.image}" alt="${item.name}" class="item-image" />
+        <p>${item.description}</p>
+        <p><strong>Origem:</strong> ${item.origin}</p>
+      `;
+
+      if (item.crafting && item.crafting.materials.length > 0) {
+        html += '<h3>Materiais necessários:</h3><ul>';
+        item.crafting.materials.forEach(mat => {
+          const matItem = itemData.find(i => i.id === mat.item);
+          if (!matItem) return;
+          html += `
+            <li>
+              <img src="${matItem.image}" alt="${matItem.name}" />
+              ${matItem.name} x ${mat.quantity * qty} 
+              ${matItem.workstation ? `<a href="#" class="workstation-link" data-station="${matItem.workstation}">[${workstations[matItem.workstation]?.name || 'Bancada'}]</a>` : ''}
+            </li>
+          `;
+        });
+        html += '</ul>';
+      } else {
+        html += '<p>Este item não requer crafting.</p>';
+      }
+
+      // Se o item tem workstation, mostra link para a bancada
+      if (item.workstation) {
+        const wb = workstations[item.workstation];
+        if (wb) {
+          html += `<p><strong>Produzido na bancada:</strong> <a href="#" class="workstation-link" data-station="${wb.id}">${wb.name}</a></p>`;
+        }
+      }
+
+      resultDiv.innerHTML = html;
+
+      // Adiciona event listeners aos links das bancadas para abrir a página da bancada
+      document.querySelectorAll('a.workstation-link').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const stationId = link.getAttribute('data-station');
+          showWorkbenchPage(stationId);
+        });
+
+        // Tooltip bancadas ao passar o mouse
+        link.addEventListener('mousemove', e => {
+          const stationId = link.getAttribute('data-station');
+          showTooltip(e, stationId);
+        });
+        link.addEventListener('mouseleave', e => {
+          hideTooltip();
+        });
       });
+    }
+
+    // Calcula e mostra os materiais (botão calcular)
+    document.querySelector('.calculate-btn').addEventListener('click', () => {
+      if (!selectedItem) {
+        alert('Por favor, selecione um item válido.');
+        return;
+      }
+      renderResult();
+    });
+
+    // Tooltip bancadas
+    function showTooltip(event, stationId) {
+      const wb = workstations[stationId];
+      if (!wb) return;
+      tooltip.style.display = 'flex';
+      tooltip.setAttribute('aria-hidden', 'false');
+      tooltip.innerHTML = `
+        <img src="${wb.image}" alt="${wb.name}" />
+        <span>${wb.name}</span>
+      `;
+      const offset = 15;
+      let x = event.pageX + offset;
+      let y = event.pageY + offset;
+
+      // Ajuste para não sair da tela
+      if (x + tooltip.offsetWidth > window.innerWidth) {
+        x = event.pageX - tooltip.offsetWidth - offset;
+      }
+      if (y + tooltip.offsetHeight > window.innerHeight) {
+        y = event.pageY - tooltip.offsetHeight - offset;
+      }
+
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+    }
+    function hideTooltip() {
+      tooltip.style.display = 'none';
+      tooltip.setAttribute('aria-hidden', 'true');
+      tooltip.innerHTML = '';
+    }
+
+    // Toggle modo escuro
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.documentElement.getAttribute('data-theme') === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        themeToggleBtn.setAttribute('aria-pressed', 'false');
+        themeToggleBtn.textContent = 'Modo Escuro';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggleBtn.setAttribute('aria-pressed', 'true');
+        themeToggleBtn.textContent = 'Modo Claro';
+      }
+    });
+
+    loadData();
   </script>
 </body>
 </html>

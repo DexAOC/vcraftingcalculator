@@ -21,10 +21,11 @@
       {
         "id": "serragem",
         "name": "Serragem",
-        "description": "Usado para a criação de Papel, Armazenamento Pequeno de Madeira e Armazenamento Grande de Madeira.",
+        "description": "Usado para a criação de Papel, Armazenamento Pequeno de Madeira e Armazenamento Grande de Madeira. Feita na <a href='#' class='workstation-link' data-station='serraria'>Serraria</a>.",
         "image": "imagens/serragem.jpg",
         "type": "Recurso",
         "origin": "Resíduo do processamento de madeira.",
+        "workstation": "serraria",
         "crafting": {
           "materials": [
             { "item": "madeira", "quantity": 20 }
