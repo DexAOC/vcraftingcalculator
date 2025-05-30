@@ -210,7 +210,8 @@
     <h2>Calculadora V Rising</h2>
     <button class="menu-button" data-content="home" aria-pressed="true"><i data-lucide="castle"></i> Início</button>
     <button class="menu-button" data-content="calculator" aria-pressed="false"><i data-lucide="tool"></i> Calculadora</button>
-    <button class="menu-button" data-content="comingsoon" aria-pressed="false"><i data-lucide="clock"></i> EM BREVE</button>
+    <button class="menu-button" data-content="items" aria-pressed="false"><i data-lucide="box"></i> Itens</button>
+    <button class="menu-button" data-content="workbenches" aria-pressed="false"><i data-lucide="hammer"></i> Bancadas</button>
     <button class="theme-toggle" id="toggleTheme" aria-pressed="false">Tema Escuro</button>
   </div>
 
@@ -222,6 +223,7 @@
   <script>
     lucide.createIcons();
     let itemData = [];
+    let workbenchData = [];
 
     const buttons = document.querySelectorAll('.menu-button');
     const main = document.getElementById('main');
@@ -252,7 +254,8 @@
         const content = btn.getAttribute('data-content');
         if(content === "home") showHome();
         else if(content === "calculator") showCalculator();
-        else if(content === "comingsoon") showComingSoon();
+        else if(content === "items") showItems();
+        else if(content === "workbenches") showWorkbenches();
       });
     });
 
@@ -404,16 +407,54 @@
 
     main.innerHTML = '<p>Carregando items...</p>';
 
-    fetch('items.json')
-      .then(response => response.json())
-      .then(json => {
-        itemData = json.items || [];
-        showHome();
-      })
-      .catch(error => {
-        console.error("Erro ao carregar items.json:", error);
-        main.innerHTML = `<p style="color: red;">Erro ao carregar os dados dos items.</p>`;
-      });
+    Promise.all([
+      fetch('items.json').then(res => res.json()),
+      fetch('workbenches.json').then(res => res.json())
+    ]).then(([itemsJson, benchesJson]) => {
+      itemData = itemsJson.items || [];
+      workbenchData = benchesJson.workbenches || [];
+      showHome();
+    }).catch(error => {
+      console.error("Erro ao carregar os dados:", error);
+      main.innerHTML = `<p style="color: red;">Erro ao carregar os dados dos itens ou bancadas.</p>`;
+    });
+
+    function showItems() {
+  let html = `
+    <h1>Todos os Itens</h1>
+    <div class="result-container">
+      <ul>
+        ${itemData.map(item => `
+          <li>
+            <img src="${item.image || 'https://via.placeholder.com/24'}" alt="${item.name}">
+            <strong>${item.name}</strong> (${item.type}) – ${item.origin}
+          </li>
+        `).join("")}
+      </ul>
+    </div>
+  `;
+  main.innerHTML = html;
+  lucide.createIcons();
+}
+function showWorkbenches() {
+  let html = `
+    <h1>Bancadas</h1>
+    <div class="result-container">
+      <ul>
+        ${workbenchData.map(wb => `
+          <li>
+            <img src="${wb.image || 'https://via.placeholder.com/24'}" alt="${wb.name}">
+            <strong>${wb.name}</strong><br>
+            <small>${wb.description}</small>
+          </li>
+        `).join("")}
+      </ul>
+    </div>
+  `;
+  main.innerHTML = html;
+  lucide.createIcons();
+}
+
   </script>
 </body>
 </html>
