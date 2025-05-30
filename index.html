@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora V Rising</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --text: #2c3e50;
+      --sidebar: #2c3e50;
+      --button: #34495e;
+      --hover: #1abc9c;
+      --detail-bg: #fff;
+      --detail-text: #222;
+    }
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #eee;
+      --sidebar: #222;
+      --button: #333;
+      --hover: #3498db;
+      --detail-bg: #222;
+      --detail-text: #eee;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: var(--sidebar);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .sidebar h2 {
+      color: white;
+      font-size: 18px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+    }
+    .menu-button {
+      padding: 12px;
+      font-size: 16px;
+      color: white;
+      background-color: var(--button);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background-color 0.3s ease;
+      text-align: left;
+    }
+    .menu-button:hover,
+    .menu-button[aria-pressed="true"] {
+      background-color: var(--hover);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      max-width: 700px;
+    }
+    .main-content h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px 0;
+    }
+    select, input[type="number"] {
+      padding: 8px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button.calculate-btn {
+      background-color: var(--button);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button.calculate-btn:hover {
+      background-color: var(--hover);
+    }
+
+    .result-container {
+      margin-top: 20px;
+      background: var(--detail-bg);
+      color: var(--detail-text);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .result-container h2 {
+      margin-bottom: 15px;
+    }
+    .result-container ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .result-container li {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .result-container li img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .item-image {
+      float: right;
+      max-width: 80px;
+      margin-left: 15px;
+      border-radius: 6px;
+    }
+
+    .theme-toggle {
+      margin-top: auto;
+      padding: 10px;
+      background: var(--button);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-x: auto;
+        justify-content: space-around;
+      }
+      .menu-button, .theme-toggle {
+        flex: 1 1 45%;
+        margin-bottom: 10px;
+      }
+      .main-content {
+        padding: 20px;
+        max-width: 100%;
+      }
+      .item-image {
+        float: none;
+        display: block;
+        margin: 0 auto 15px auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Calculadora V Rising</h2>
+    <button class="menu-button" aria-label="Abrir Início" data-content="home" aria-pressed="true">
+      <i data-lucide="castle"></i> Início
+    </button>
+    <button class="menu-button" aria-label="Abrir Calculadora" data-content="calculator" aria-pressed="false">
+      <i data-lucide="tool"></i> Calculadora
+    </button>
+    <button class="menu-button" aria-label="Seção Em Breve" data-content="comingsoon" aria-pressed="false">
+      <i data-lucide="clock"></i> EM BREVE
+    </button>
+    <button class="theme-toggle" id="toggleTheme" aria-pressed="false">Tema Escuro</button>
+  </div>
+
+  <div class="main-content" id="main">
+    <h1>Bem-vindo à Calculadora V Rising</h1>
+    <p>Selecione uma opção no menu à esquerda para começar.</p>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    let itemData = [];
+
+    const buttons = document.querySelectorAll('.menu-button');
+    const main = document.getElementById('main');
+    const themeBtn = document.getElementById('toggleTheme');
+
+    function updateThemeLabel(theme) {
+      themeBtn.textContent = theme === "dark" ? "Tema Claro" : "Tema Escuro";
+      themeBtn.setAttribute('aria-pressed', theme === "dark" ? "true" : "false");
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      updateThemeLabel(theme);
+    }
+
+    const savedTheme = localStorage.getItem("theme") || "light";
+    applyTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(newTheme);
+      localStorage.setItem("theme", newTheme);
+    });
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+
+        const content = btn.getAttribute('data-content');
+        if(content === "home") showHome();
+        else if(content === "calculator") showCalculator();
+        else if(content === "comingsoon") showComingSoon();
+      });
+    });
+
+    function showHome() {
+      main.innerHTML = `
+        <h1>Bem-vindo à Calculadora V Rising</h1>
+        <p>Selecione uma opção no menu à esquerda para começar.</p>
+      `;
+      lucide.createIcons();
+    }
+
+    function showComingSoon() {
+      main.innerHTML = `
+        <h1>Em Breve</h1>
+        <p>Novas funcionalidades estão a caminho. Fique ligado!</p>
+      `;
+      lucide.createIcons();
+    }
+
+    function renderMaterials(materials, quantity, depth = 0) {
+      if (!materials || materials.length === 0) return "<p>Este item não requer materiais para crafting.</p>";
+      let listHTML = "<ul>";
+      materials.forEach(mat => {
+        const matItem = itemData.find(i => i.id === mat.item);
+        const totalQty = mat.quantity * quantity;
+        const imgHTML = matItem?.image ? `<img src="${matItem.image}" alt="${matItem.name}">` : "";
+        const hasSub = matItem?.crafting?.materials?.length > 0;
+        const btnHTML = hasSub
+          ? `<button class="expand-btn" data-item="${matItem.id}" data-qty="${totalQty}" data-depth="${depth + 1}" style="margin-left:6px;">+</button>`
+          : "";
+        const nestedId = `nested-${matItem?.id}-${depth + 1}`;
+        listHTML += `
+          <li style="margin-left:${depth * 20}px;">
+            ${imgHTML}${totalQty}x ${matItem ? matItem.name : mat.item}
+            ${btnHTML}
+            <div id="${nestedId}" class="nested" style="margin-top:6px;"></div>
+          </li>
+        `;
+      });
+      listHTML += "</ul>";
+      return listHTML;
+    }
+
+    function attachExpandListeners(container) {
+      container.querySelectorAll('.expand-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const itemId = btn.getAttribute('data-item');
+          const qty = parseInt(btn.getAttribute('data-qty'));
+          const depth = parseInt(btn.getAttribute('data-depth'));
+          const targetDiv = document.getElementById(`nested-${itemId}-${depth}`);
+          const item = itemData.find(i => i.id === itemId);
+
+          if (!targetDiv || !item?.crafting?.materials?.length) return;
+
+          if (targetDiv.innerHTML.trim() === "") {
+            targetDiv.innerHTML = renderMaterials(item.crafting.materials, qty, depth);
+            btn.textContent = "−";
+            attachExpandListeners(targetDiv);
+          } else {
+            targetDiv.innerHTML = "";
+            btn.textContent = "+";
+          }
+        });
+      });
+    }
+
+    function showCalculator() {
+      let html = `
+        <h1>Calculadora de Crafting</h1>
+        <label for="itemSelect">Selecione o item que deseja criar:</label>
+        <select id="itemSelect" aria-label="Selecionar item para crafting">
+          <option value="" disabled selected>-- Escolha um item --</option>
+      `;
+      itemData.forEach(item => {
+        html += `<option value="${item.id}">${item.name}</option>`;
+      });
+      html += `
+        </select>
+        <label for="quantityInput">Quantidade desejada:</label>
+        <input type="number" id="quantityInput" min="1" value="1" aria-label="Quantidade desejada" />
+        <button class="calculate-btn" id="calculateBtn">Calcular materiais</button>
+
+        <div class="result-container" id="result" style="display:none;"></div>
+      `;
+
+      main.innerHTML = html;
+      lucide.createIcons();
+
+      const itemSelect = document.getElementById('itemSelect');
+      const quantityInput = document.getElementById('quantityInput');
+      const calculateBtn = document.getElementById('calculateBtn');
+      const result = document.getElementById('result');
+
+      calculateBtn.addEventListener('click', () => {
+        const selectedId = itemSelect.value;
+        const quantity = Math.max(1, parseInt(quantityInput.value) || 1);
+        quantityInput.value = quantity;
+
+        if (!selectedId) {
+          alert("Por favor, selecione um item.");
+          return;
+        }
+
+        const item = itemData.find(i => i.id === selectedId);
+        if (!item) return;
+
+        const materials = renderMaterials(item.crafting?.materials || [], quantity);
+
+        result.style.display = "block";
+        result.innerHTML = `
+          <h2>${item.name} (x${quantity})</h2>
+          <img src="${item.image || 'https://via.placeholder.com/80?text=No+Image'}" alt="${item.name}" class="item-image" />
+          <p><strong>Descrição:</strong> ${item.description}</p>
+          <p><strong>Tipo:</strong> ${item.type}</p>
+          <p><strong>Origem:</strong> ${item.origin}</p>
+          <h3>Materiais necessários:</h3>
+          ${materials}
+        `;
+
+        attachExpandListeners(result);
+        result.scrollIntoView({behavior: "smooth"});
+      });
+    }
+
+    main.innerHTML = '<p>Carregando items...</p>';
+
+    fetch('items.json')
+      .then(response => response.json())
+      .then(json => {
+        itemData = json.items || [];
+        showHome();
+      })
+      .catch(error => {
+        console.error("Erro ao carregar items.json:", error);
+        main.innerHTML = `<p style="color: red;">Erro ao carregar os dados dos items.</p>`;
+      });
+  </script>
+</body>
+</html>

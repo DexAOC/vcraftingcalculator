@@ -1,0 +1,64 @@
+{
+    "items": [
+      {
+        "id": "madeira",
+        "name": "Madeira",
+        "description": "Comumente usada na construção e na fabricação de itens.",
+        "image": "imagens/madeira.jpg",
+        "type": "Coletável",
+        "origin": "Coletada ao cortar árvores",
+        "crafting": null
+      },
+      {
+        "id": "fibra_vegetal",
+        "name": "Fibra Vegetal",
+        "description": "Materiais fibrosos comuns usados na fabricação de itens consumíveis básicos.",
+        "image": "imagens/fibra_vegetal.jpg",
+        "type": "Coletável",
+        "origin": "Coletada ao cortar arbustos",
+        "crafting": null
+      },
+      {
+        "id": "serragem",
+        "name": "Serragem",
+        "description": "Usado para a criação de Papel, Armazenamento Pequeno de Madeira e Armazenamento Grande de Madeira.",
+        "image": "imagens/serragem.jpg",
+        "type": "Recurso",
+        "origin": "Resíduo do processamento de madeira.",
+        "crafting": {
+          "materials": [
+            { "item": "madeira", "quantity": 20 }
+          ]
+        }
+      },
+      {
+        "id": "papel",
+        "name": "Papel",
+        "description": "Usado para criação de Pergaminho, Armazenamento Pequeno de Conhecimento e Mesa de Pesquisa.",
+        "image": "imagens/papel.jpg",
+        "type": "Recurso",
+        "origin": "É produzido em uma Prensa de Papel.",
+        "crafting": {
+          "materials": [
+            { "item": "serragem", "quantity": 4 },
+            { "item": "fibra_vegetal", "quantity": 4 }
+          ]
+        }
+      },
+      {
+        "id": "pergaminho",
+        "name": "Pergaminho",
+        "description": "Usado para descobrir novas tecnologias em um Escritório.",
+        "image": "imagens/pergaminho.jpg",
+        "type": "Recurso",
+        "origin": "É produzido em uma Prensa de Papel.",
+        "crafting": {
+          "materials": [
+            { "item": "papel", "quantity": 8 },
+            { "item": "linha grossa", "quantity": 4 }
+          ]
+        }
+      }
+    ]
+  }
+  
