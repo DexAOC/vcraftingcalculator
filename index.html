@@ -88,7 +88,7 @@
       display: block;
       margin: 10px 0 5px 0;
     }
-    select, input[type="number"] {
+    select, input[type="number"], input[type="text"] {
       padding: 8px;
       font-size: 16px;
       width: 100%;
@@ -97,6 +97,28 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+    ul#suggestions {
+      max-width: 300px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: var(--detail-bg);
+      position: absolute;
+      z-index: 10;
+    }
+    ul#suggestions li {
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    ul#suggestions li:hover {
+      background-color: var(--hover);
+      color: white;
+    }
+
     button.calculate-btn {
       background-color: var(--button);
       color: white;
@@ -186,15 +208,9 @@
 
   <div class="sidebar">
     <h2>Calculadora V Rising</h2>
-    <button class="menu-button" aria-label="Abrir Início" data-content="home" aria-pressed="true">
-      <i data-lucide="castle"></i> Início
-    </button>
-    <button class="menu-button" aria-label="Abrir Calculadora" data-content="calculator" aria-pressed="false">
-      <i data-lucide="tool"></i> Calculadora
-    </button>
-    <button class="menu-button" aria-label="Seção Em Breve" data-content="comingsoon" aria-pressed="false">
-      <i data-lucide="clock"></i> EM BREVE
-    </button>
+    <button class="menu-button" data-content="home" aria-pressed="true"><i data-lucide="castle"></i> Início</button>
+    <button class="menu-button" data-content="calculator" aria-pressed="false"><i data-lucide="tool"></i> Calculadora</button>
+    <button class="menu-button" data-content="comingsoon" aria-pressed="false"><i data-lucide="clock"></i> EM BREVE</button>
     <button class="theme-toggle" id="toggleTheme" aria-pressed="false">Tema Escuro</button>
   </div>
 
@@ -205,7 +221,6 @@
 
   <script>
     lucide.createIcons();
-
     let itemData = [];
 
     const buttons = document.querySelectorAll('.menu-button');
@@ -216,12 +231,10 @@
       themeBtn.textContent = theme === "dark" ? "Tema Claro" : "Tema Escuro";
       themeBtn.setAttribute('aria-pressed', theme === "dark" ? "true" : "false");
     }
-
     function applyTheme(theme) {
       document.documentElement.setAttribute("data-theme", theme);
       updateThemeLabel(theme);
     }
-
     const savedTheme = localStorage.getItem("theme") || "light";
     applyTheme(savedTheme);
 
@@ -236,7 +249,6 @@
       btn.addEventListener('click', () => {
         buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
-
         const content = btn.getAttribute('data-content');
         if(content === "home") showHome();
         else if(content === "calculator") showCalculator();
@@ -268,9 +280,7 @@
         const totalQty = mat.quantity * quantity;
         const imgHTML = matItem?.image ? `<img src="${matItem.image}" alt="${matItem.name}">` : "";
         const hasSub = matItem?.crafting?.materials?.length > 0;
-        const btnHTML = hasSub
-          ? `<button class="expand-btn" data-item="${matItem.id}" data-qty="${totalQty}" data-depth="${depth + 1}" style="margin-left:6px;">+</button>`
-          : "";
+        const btnHTML = hasSub ? `<button class="expand-btn" data-item="${matItem.id}" data-qty="${totalQty}" data-depth="${depth + 1}" style="margin-left:6px;">+</button>` : "";
         const nestedId = `nested-${matItem?.id}-${depth + 1}`;
         listHTML += `
           <li style="margin-left:${depth * 20}px;">
@@ -292,9 +302,7 @@
           const depth = parseInt(btn.getAttribute('data-depth'));
           const targetDiv = document.getElementById(`nested-${itemId}-${depth}`);
           const item = itemData.find(i => i.id === itemId);
-
           if (!targetDiv || !item?.crafting?.materials?.length) return;
-
           if (targetDiv.innerHTML.trim() === "") {
             targetDiv.innerHTML = renderMaterials(item.crafting.materials, qty, depth);
             btn.textContent = "−";
@@ -310,58 +318,87 @@
     function showCalculator() {
       let html = `
         <h1>Calculadora de Crafting</h1>
-        <label for="itemSelect">Selecione o item que deseja criar:</label>
-        <select id="itemSelect" aria-label="Selecionar item para crafting">
-          <option value="" disabled selected>-- Escolha um item --</option>
-      `;
-      itemData.forEach(item => {
-        html += `<option value="${item.id}">${item.name}</option>`;
-      });
-      html += `
-        </select>
+        <label for="itemSearch">Digite o nome do item:</label>
+        <input type="text" id="itemSearch" autocomplete="off" />
+        <ul id="suggestions" style="display:none;"></ul>
+
         <label for="quantityInput">Quantidade desejada:</label>
-        <input type="number" id="quantityInput" min="1" value="1" aria-label="Quantidade desejada" />
+        <input type="number" id="quantityInput" min="1" value="1" />
         <button class="calculate-btn" id="calculateBtn">Calcular materiais</button>
 
         <div class="result-container" id="result" style="display:none;"></div>
       `;
-
       main.innerHTML = html;
       lucide.createIcons();
 
-      const itemSelect = document.getElementById('itemSelect');
+      const itemSearch = document.getElementById('itemSearch');
+      const suggestions = document.getElementById('suggestions');
       const quantityInput = document.getElementById('quantityInput');
       const calculateBtn = document.getElementById('calculateBtn');
       const result = document.getElementById('result');
 
-      calculateBtn.addEventListener('click', () => {
-        const selectedId = itemSelect.value;
-        const quantity = Math.max(1, parseInt(quantityInput.value) || 1);
-        quantityInput.value = quantity;
+      let selectedItem = null;
 
-        if (!selectedId) {
-          alert("Por favor, selecione um item.");
+      itemSearch.addEventListener('input', () => {
+        const term = itemSearch.value.toLowerCase().trim();
+        suggestions.innerHTML = '';
+        selectedItem = null;
+
+        if (term.length < 2) {
+          suggestions.style.display = 'none';
           return;
         }
 
-        const item = itemData.find(i => i.id === selectedId);
-        if (!item) return;
+        const filtered = itemData.filter(item => item.name.toLowerCase().includes(term));
 
-        const materials = renderMaterials(item.crafting?.materials || [], quantity);
+        filtered.forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <img src="${item.image || 'https://via.placeholder.com/24'}" style="width:24px;height:24px;margin-right:8px;border-radius:4px;vertical-align:middle;" />
+            <span>${item.name}</span>
+          `;
+          li.addEventListener('click', () => {
+            itemSearch.value = item.name;
+            selectedItem = item;
+            suggestions.innerHTML = '';
+            suggestions.style.display = 'none';
+          });
+          suggestions.appendChild(li);
+        });
+
+        suggestions.style.display = filtered.length > 0 ? 'block' : 'none';
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!suggestions.contains(e.target) && e.target !== itemSearch) {
+          suggestions.style.display = 'none';
+        }
+      });
+
+      calculateBtn.addEventListener('click', () => {
+        const quantity = Math.max(1, parseInt(quantityInput.value) || 1);
+        quantityInput.value = quantity;
+
+        if (!selectedItem) {
+          alert("Por favor, selecione um item da lista.");
+          return;
+        }
+
+        const materials = renderMaterials(selectedItem.crafting?.materials || [], quantity);
 
         result.style.display = "block";
         result.innerHTML = `
-          <h2>${item.name} (x${quantity})</h2>
-          <img src="${item.image || 'https://via.placeholder.com/80?text=No+Image'}" alt="${item.name}" class="item-image" />
-          <p><strong>Descrição:</strong> ${item.description}</p>
-          <p><strong>Tipo:</strong> ${item.type}</p>
-          <p><strong>Origem:</strong> ${item.origin}</p>
+          <h2>${selectedItem.name} (x${quantity})</h2>
+          <img src="${selectedItem.image || 'https://via.placeholder.com/80?text=No+Image'}" alt="${selectedItem.name}" class="item-image" />
+          <p><strong>Descrição:</strong> ${selectedItem.description}</p>
+          <p><strong>Tipo:</strong> ${selectedItem.type}</p>
+          <p><strong>Origem:</strong> ${selectedItem.origin}</p>
           <h3>Materiais necessários:</h3>
           ${materials}
         `;
 
         attachExpandListeners(result);
-        result.scrollIntoView({behavior: "smooth"});
+        result.scrollIntoView({ behavior: "smooth" });
       });
     }
 
