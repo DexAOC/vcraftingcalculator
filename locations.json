@@ -12,8 +12,6 @@
     "itemId": "fibra_vegetal",
     "itemName": "Fibra Vegetal",
     "locations": [
-      { "x": 800,  "y": 300 },
-      { "x": 1600, "y": 700 },
       { "x": 2000, "y": 1500 }
     ]
   },

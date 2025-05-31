@@ -413,6 +413,7 @@
           </button>
 
           <div id="result" class="result-container" style="display:none;"></div>
+          <div id="map-wrapper"></div>
         `;
         setLanguage(currentLang);
         this.setupCalculator();
@@ -849,6 +850,7 @@
       //  4.17) Configura Botões “Mapa” (resources)
       // =========================
       setupMapButtons() {
+        console.log(">> setupMapButtons() — configurando listeners de Mapa");
         document.querySelectorAll('#result .map-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             console.log('Clique em Mapa detectado para itemId =', btn.getAttribute('data-itemid'));
@@ -863,67 +865,65 @@
       //  4.18) Exibe / Oculta Mapa Leaflet para um recurso específico
       // =========================
       showMapForItem(itemId, itemName) {
-        // Se já existe <div id="map-container-<itemId>">, remova e saia (toggle)
-        const existing = document.getElementById(`map-container-${itemId}`);
-        if (existing) {
-          existing.remove();
-          return;
-        }
-
-        // 1) Cria novo contêiner <div id="map-container-<itemId>"> dentro de #result
-        const resultDiv = document.getElementById('result');
-        const mapDiv = document.createElement('div');
-        mapDiv.id = `map-container-${itemId}`;
-        mapDiv.style.width = '100%';
-        mapDiv.style.height = '300px';       // altura fixa; ajustável se quiser
-        mapDiv.style.marginTop = '16px';
-        mapDiv.style.border = '1px solid var(--border)';
-        mapDiv.style.borderRadius = '4px';
-        resultDiv.appendChild(mapDiv);
-
-        // 2) Procura as coordenadas em this.resourceData
-        const dataEntry = this.resourceData.find(r => r.itemId === itemId);
-        if (!dataEntry) {
-          mapDiv.innerHTML = `
-            <p style="padding:16px; color: var(--error)">
-              Nenhum dado de localização encontrado para "<strong>${itemName}</strong>".
-            </p>`;
-          return;
-        }
-
-        // 3) Inicializa Leaflet com CRS.Simple
-        //    Supondo que "imagens/mapa.png" tenha 6080×6080 px
-        const mapWidth  = 6080;
-        const mapHeight = 6080;
-
-        const leafletMap = L.map(mapDiv.id, {
-          crs: L.CRS.Simple,
-          minZoom: -2,
-          maxZoom: 2,
-          zoomSnap: 0.1
-        });
-
-        const bounds = [[0, 0], [mapHeight, mapWidth]];
-
-        // **AQUI FOI A MUDANÇA**: ajustamos o caminho para "imagens/mapa.png"
-        L.imageOverlay('imagens/mapa.png', bounds).addTo(leafletMap);
-
-        leafletMap.fitBounds(bounds);
-
-        // 4) Plota marcadores para cada local em dataEntry.locations
-        dataEntry.locations.forEach(loc => {
-          L.marker([loc.y, loc.x], {
-            title: itemName
-          })
-            .bindTooltip(itemName, {
-              direction: 'top',
-              offset: [0, -10],
-              permanent: false
-            })
-            .addTo(leafletMap);
-        });
+      // 1) Toggle: se o mapa já existe, apenas remove e sai
+      const existingMap = document.getElementById(`map-container-${itemId}`);
+      if (existingMap) {
+        existingMap.remove();
+        return;
       }
-    }
+
+      // 2) Cria o div para o Leaflet desenhar o mapa
+      const mapDiv = document.createElement("div");
+      mapDiv.id = `map-container-${itemId}`;
+      mapDiv.style.width = "100%";
+      mapDiv.style.height = "300px";
+      mapDiv.style.marginTop = "16px";
+      mapDiv.style.border = "1px solid var(--border)";
+      mapDiv.style.borderRadius = "4px";
+
+      // 3) Em vez de usar o #result, pegamos o #map-wrapper
+      const mapWrapper = document.getElementById("map-wrapper");
+      // Limpa qualquer mapa anterior (caso o usuário clique em outro recurso)
+      mapWrapper.innerHTML = "";
+      // E anexa o novo mapDiv lá dentro
+      mapWrapper.appendChild(mapDiv);
+
+      // 4) Procura no locations.json (já carregado em this.resourceData)
+      const dataEntry = this.resourceData.find(r => r.itemId === itemId);
+      if (!dataEntry) {
+        mapDiv.innerHTML = `
+          <p style="padding:16px; color: var(--error)">
+            Nenhum dado de localização encontrado para "<strong>${itemName}</strong>".
+          </p>`;
+        return;
+      }
+
+      // 5) Inicializa o Leaflet em mapDiv
+      const mapWidth  = 6080;
+      const mapHeight = 6080;
+      const leafletMap = L.map(mapDiv.id, {
+        crs: L.CRS.Simple,
+        minZoom: -2,
+        maxZoom: 2,
+        zoomSnap: 0.1
+      });
+      const bounds = [[0, 0], [mapHeight, mapWidth]];
+
+      // 6) Carrega a imagem de fundo. Como index.html e “imagens/” estão no mesmo nível,
+      //    use exatamente este caminho:
+      L.imageOverlay("imagens/mapa.png", bounds).addTo(leafletMap);
+
+      leafletMap.fitBounds(bounds);
+      leafletMap.setMaxBounds(bounds);
+
+      // 7) Coloca cada marcador (pino) na coordenada correta
+      dataEntry.locations.forEach(loc => {
+        L.marker([loc.y, loc.x], { title: itemName })
+          .bindTooltip(itemName, { direction: "top", offset: [0, -10], permanent: false })
+          .addTo(leafletMap);
+      });
+    },
+}
 
     // =========================
     //  4.19) Traduções (i18n)

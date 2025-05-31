@@ -285,7 +285,6 @@ body {
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
 }
 .main-content h1 {
   font-size: 2rem;
@@ -668,21 +667,13 @@ ul.suggestions li .item-type {
   font-size: 0.9rem;        /* texto um pouco menor, se preferir */
   color: inherit;           /* mantém a mesma cor do botão (ou do contêiner) */
 }
-/* ============== (ANEXAR AO FINAL DO styles.css) ============== */
-/* Contêiner dinâmico do mapa dentro de #result */
-#result > div[id^="map-container-"] {
-  width: 100%;
-  height: 300px;       /* altura fixa de 300px; ajuste se desejar maior/menor */
-  margin-top: 16px;    /* espaço entre a lista de materiais e o mapa */
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
 
 /* Garante que o Leaflet ocupe todo o contêiner pai */
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
 }
+
 /* ===============================
    1. Sidebar responsiva em mobile
    =============================== */
@@ -817,209 +808,43 @@ ul.suggestions li .item-type {
     font-size: 0.85rem;
   }
 }
-/* ================================
-   1) Garantir que nada “vaze” na horizontal
-   ================================ */
-html, body {
-  margin: 0;
-  padding: 0;
-  /* Faz com que qualquer overflow horizontal seja escondido */
-  overflow-x: hidden;
+/* ============================= */
+/* Mantido TODO O CSS ACIMA    */
+/* ============================= */
+
+/* ============================ */
+/* Adições para corrigir o mapa */
+/* ============================ */
+
+/* Impedir que #map-wrapper e seu filho encolham em containers flex */
+#map-wrapper {
+  display: block;
+  flex: none;
+}
+#map-wrapper > div[id^="map-container-"] {
+  width: 100%;
+  height: 450px !important;   /* força 300px de altura */
+  min-height: 450px;          /* impede altura menor que 300px */
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  flex: none !important;      /* não encolhe em flex containers */
 }
 
-/* Aplica BOX-SIZING em todos os elementos para evitar cálculos inesperados de width/padding */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* Garante que o Leaflet ocupe exatamente o espaço pai */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-/* ================================
-   2) Ajustes específicos para mobile
-   ================================ */
-@media (max-width: 768px) {
-  /* A garantia extra para o container principal não extrapolar */
-  .content-wrapper,
-  .main-content {
-    width: 100%;
-    padding-right: 0;
-    margin-right: 0;
-  }
-
-  /* Se houver algum result-container com padding lateral, podemos reduzir para encaixar melhor */
-  .result-container {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  /* Reforce que nenhum elemento direto de .result ou .hero extrapole 100% */
-  .hero,
-  .sub-hero-section,
-  .materials-list,
-  .materials-list li,
-  .materials-list img {
-    max-width: 100%;
-  }
-}
-/* ────────────────────────────────────────────────
-   Ajustes finais para que o Footer caiba no Mobile
-   ──────────────────────────────────────────────── */
-
-/* 1) Impedir overflow horizontal geral */
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Garante que nada “vaze” pela lateral */
-}
-
-/* 2) Box-sizing universal para evitar cálculos errados de largura */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-/* 3) Media query para telas menores que 768px */
-@media (max-width: 768px) {
-  /* 3.1) Faz o footer ocupar 100% e empilha as colunas */
-  .main-footer {
-    display: flex !important;            /* Garante flex container */
-    flex-direction: column !important;   /* Colunas empilhadas */
-    align-items: flex-start;             /* Conteúdo alinhado à esquerda */
-    gap: 16px;                           /* Espaçamento entre colunas */
-    padding: 16px 12px !important;       /* Padding interno reduzido */
-    width: 100vw !important;             /* Força 100% da viewport */
-    margin: 0 auto !important;           /* Centraliza, caso haja max-width */
-    border-radius: 0 !important;         /* Remove arredondamento se necessário */
-  }
-
-  /* 3.2) Cada coluna agora ocupa 100% da largura sem margens laterais */
-  .footer-col {
-    width: 100% !important;              /* Garante largura total do pai */
-    flex: 1 1 auto !important;           /* Ajusta flex para ocupar linha completa */
-    margin: 0 !important;                /* Remove margens que empurrem para a direita */
-    padding: 0 !important;               /* Remove padding lateral extra */
-  }
-
-  /* 3.3) Ajuste de títulos e textos para não extrapolar */
-  .footer-col h4 {
-    font-size: 1rem;
-    margin-bottom: 8px;
-  }
-  .footer-col p,
-  .footer-col ul,
-  .footer-col a {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    margin: 0;                           /* Remove qualquer margem extra */
-    padding: 0;                          /* Remove padding inesperado */
-    word-break: break-word;              /* Quebra texto muito longo */
-  }
-
-  /* 3.4) Listas de links sem recuo */
-  .footer-col ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0 0 8px 0;
-  }
-  .footer-col ul li {
-    margin-bottom: 6px;                  /* Espaçamento vertical entre itens */
-  }
-
-  /* 3.5) Garante que neither .content-inner nem .content-wrapper cause overflow */
-  .content-wrapper,
-  .content-inner {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* 3.6) Ajuste de padding interno dos containers de conteúdo */
-  .main-content,
-  .result-container {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-}
-/* ───────────────────────────────────────────────────────
-   BLOCO FINAL PARA CORRIGIR O RODAPÉ NO MOBILE (ATUALIZAÇÃO)
-   ─────────────────────────────────────────────────────── */
-
-/* 1) Em toda a página, não deixar overflow horizontal aparecer */
+/* Reforça box-sizing e oculta overflow horizontal geral */
 html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
-
-/* 2) Garantir box‐sizing para evitar cálculos de width + padding estourando 100%  */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
-/* 3) Media query para telas até 768px (tablet/phone) */
-@media (max-width: 768px) {
-  /* 3.1) O rodapé deve ter 100% da viewport e empilhar as colunas verticalmente */
-  .main-footer {
-    display: flex !important;             /* certifica‐se de que é flex container */
-    flex-direction: column !important;    /* uma coluna embaixo da outra */
-    align-items: flex-start;              /* alinhado à esquerda */
-    width: 100vw !important;              /* força a largura exata da viewport */
-    margin: 0 auto !important;            /* remove margens extras à direita ou esquerda */
-    padding: 16px 12px !important;        /* padding interno mais fino */
-    gap: 16px !important;                  /* espaço vertical entre colunas */
-    border-radius: 0 !important;          /* sem cantos arredondados que possam cortar */
-  }
-
-  /* 3.2) Cada coluna do footer ocupa 100% da largura e sem margens laterais */
-  .footer-col {
-    flex: none !important;                /* não tenta encolher/proporcionalmente */
-    width: 100% !important;               /* ocupa toda a largura do .main-footer */
-    margin: 0 !important;                 /* retira margens que empurrariam para a direita */
-    padding: 0 !important;                /* remove padding lateral extra */
-  }
-
-  /* 3.3) Títulos e textos de cada coluna não devem exceder a largura */
-  .footer-col h4 {
-    font-size: 1rem;
-    margin-bottom: 8px;
-  }
-  .footer-col p,
-  .footer-col ul,
-  .footer-col a {
-    font-size: 0.9rem;
-    line-height: 1.4;
-    margin: 0;                            /* remove margens extras */
-    padding: 0;                           /* remove padding inesperado */
-    word-break: break-word;               /* força quebra de palavra se necessário */
-  }
-
-  /* 3.4) Listas de links sem recuos ou marcadores que causem overflow */
-  .footer-col ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0 0 8px 0;
-  }
-  .footer-col ul li {
-    margin-bottom: 6px;
-  }
-
-  /* 3.5) Garantir que o container principal não adicione padding lateral extra */
-  .content-wrapper,
-  .content-inner {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 0 !important;
-  }
-
-  /* 3.6) Ajuste final do padding interno dos containers dinâmicos */
-  .main-content,
-  .result-container {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-}
-
