@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora V Rising</title>
+  <title>AOC-CraftingCalc</title>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -424,12 +424,49 @@
       visibility: visible;
       bottom: calc(100% + 5px);
     }
+    .language-selector {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+      gap: 0.5rem;
+    }
+
+    .language-btn {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background-color: var(--detail-bg);
+      color: var(--detail-text);
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .language-btn img {
+      width: 18px;
+      height: auto;
+      margin-right: 6px;
+    }
+
+    /* ─── AQUI ─── coloque as regras de active e hover depois das anteriores ─── */
+    .language-btn.active {
+      background-color: #1abc9c !important;
+      color: #ffffff !important;
+      border-color: #16a085 !important;
+    }
+
+    .language-btn:hover {
+      background-color: #16a085;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
 
   <div class="sidebar">
-    <h2><i class="fas fa-calculator"></i> Calculadora V Rising</h2>
+    <h2><i class="fas fa-calculator"></i> VCraftingCalculator</h2>
     <button class="menu-button" data-content="home" aria-pressed="true">
       <i class="fas fa-home"></i> Início
     </button>
@@ -447,12 +484,12 @@
     </button>
 
     <div class="language-selector">
-      <label for="languageSelect"><i class="fas fa-language"></i> Idioma</label>
-      <select id="languageSelect" class="language-select">
-        <option value="pt">🇧🇷 Português</option>
-        <option value="en">🇺🇸 English</option>
-        <option value="es">🇪🇸 Español</option>
-      </select>
+      <button class="language-btn" data-lang="pt-BR">
+        <img src="https://flagcdn.com/24x18/br.png" alt="🇧🇷"> pt-BR
+      </button>
+      <button class="language-btn" data-lang="en-US">
+        <img src="https://flagcdn.com/24x18/us.png" alt="🇺🇸"> en-US
+      </button>
     </div>
 
     <button class="theme-toggle" id="toggleTheme">
@@ -624,8 +661,9 @@
       showHome() {
         const main = document.getElementById('main');
         main.innerHTML = `
-          <h1>Bem-vindo à Calculadora V Rising</h1>
-          <p>Esta ferramenta ajuda você a calcular os materiais necessários para criar itens no jogo V Rising.</p>
+          <h1>Bem-vindo</h1>
+          <p>Desenvolvida por dois fãs do jogo, esta é a V Crafting Calculator</p>
+          <p>Aviso: Esta ferramenta não é uma aplicação oficial da desenvolvedora Stunlock Studios, tampouco possui quaisquer fins comerciais. Seu propósito exclusivo é proporcionar auxílio à comunidade de jogadores do jogo V Rising.</p>
           
           <div class="result-container">
             <h2>Recursos disponíveis:</h2>
@@ -640,9 +678,10 @@
           <h2>Dicas de uso</h2>
           <div class="result-container">
             <ul class="materials-list">
+              <li>Altere o idioma no menu à esquerda</li>
               <li>Use a calculadora para planejar suas construções</li>
               <li>Adicione itens frequentes aos favoritos</li>
-              <li>Altere o tema no menu à esquerda</li>
+              <li>Altere entre tema claro ou escuro no menu à esquerda</li>
             </ul>
           </div>
         `;
@@ -1043,6 +1082,30 @@
     
     // Expor funções para o escopo global (para eventos onclick em HTML)
     window.VrisingCalculator = VrisingCalculator;
+
+    // 1) Traduções já definidas anteriormente
+    const translations = { /* ... seu objeto ... */ };
+    function translatePage(lang) { /* ... sua função ... */ }
+
+    // 2) Função para setar idioma e salvar preferência
+    function setLanguage(lang) {
+      document.documentElement.lang = lang;
+      localStorage.setItem('lang', lang);
+      translatePage(lang);
+      document.querySelectorAll('.language-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
+
+    // 3) Gatilhos nos botões
+    document.querySelectorAll('.language-btn').forEach(btn => {
+      btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    });
+
+    // 4) Ao carregar, força pt-BR se não houver preferência
+    const initialLang = localStorage.getItem('lang') || 'pt-BR';
+    setLanguage(initialLang);
+
   </script>
 </body>
 </html>

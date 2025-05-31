@@ -50,7 +50,7 @@
         "id": "pergaminho",
         "name": "Pergaminho",
         "description": "Usado para descobrir novas tecnologias em um Escritório.",
-        "image": "imagens/pergaminho.jpg",
+        "image": "imagens/pergaminho.png",
         "type": "Recurso",
         "origin": "É produzido em uma Prensa de Papel.",
         "crafting": {
