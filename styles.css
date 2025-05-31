@@ -941,4 +941,85 @@ html, body {
     padding-right: 12px !important;
   }
 }
+/* ───────────────────────────────────────────────────────
+   BLOCO FINAL PARA CORRIGIR O RODAPÉ NO MOBILE (ATUALIZAÇÃO)
+   ─────────────────────────────────────────────────────── */
+
+/* 1) Em toda a página, não deixar overflow horizontal aparecer */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* 2) Garantir box‐sizing para evitar cálculos de width + padding estourando 100%  */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 3) Media query para telas até 768px (tablet/phone) */
+@media (max-width: 768px) {
+  /* 3.1) O rodapé deve ter 100% da viewport e empilhar as colunas verticalmente */
+  .main-footer {
+    display: flex !important;             /* certifica‐se de que é flex container */
+    flex-direction: column !important;    /* uma coluna embaixo da outra */
+    align-items: flex-start;              /* alinhado à esquerda */
+    width: 100vw !important;              /* força a largura exata da viewport */
+    margin: 0 auto !important;            /* remove margens extras à direita ou esquerda */
+    padding: 16px 12px !important;        /* padding interno mais fino */
+    gap: 16px !important;                  /* espaço vertical entre colunas */
+    border-radius: 0 !important;          /* sem cantos arredondados que possam cortar */
+  }
+
+  /* 3.2) Cada coluna do footer ocupa 100% da largura e sem margens laterais */
+  .footer-col {
+    flex: none !important;                /* não tenta encolher/proporcionalmente */
+    width: 100% !important;               /* ocupa toda a largura do .main-footer */
+    margin: 0 !important;                 /* retira margens que empurrariam para a direita */
+    padding: 0 !important;                /* remove padding lateral extra */
+  }
+
+  /* 3.3) Títulos e textos de cada coluna não devem exceder a largura */
+  .footer-col h4 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .footer-col p,
+  .footer-col ul,
+  .footer-col a {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;                            /* remove margens extras */
+    padding: 0;                           /* remove padding inesperado */
+    word-break: break-word;               /* força quebra de palavra se necessário */
+  }
+
+  /* 3.4) Listas de links sem recuos ou marcadores que causem overflow */
+  .footer-col ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 8px 0;
+  }
+  .footer-col ul li {
+    margin-bottom: 6px;
+  }
+
+  /* 3.5) Garantir que o container principal não adicione padding lateral extra */
+  .content-wrapper,
+  .content-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 0 !important;
+  }
+
+  /* 3.6) Ajuste final do padding interno dos containers dinâmicos */
+  .main-content,
+  .result-container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
 
