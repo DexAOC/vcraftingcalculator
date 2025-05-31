@@ -468,19 +468,19 @@
   <div class="sidebar">
     <h2><i class="fas fa-calculator"></i> VCraftingCalculator</h2>
     <button class="menu-button" data-content="home" aria-pressed="true">
-      <i class="fas fa-home"></i> Início
+      <i class="fas fa-home"></i> <span data-i18n="home"></span>
     </button>
     <button class="menu-button" data-content="calculator" aria-pressed="false">
-      <i class="fas fa-calculator"></i> Calculadora
+      <i class="fas fa-calculator"></i> <span data-i18n="calculator"></span>
     </button>
     <button class="menu-button" data-content="favorites" aria-pressed="false">
-      <i class="fas fa-star"></i> Favoritos
+      <i class="fas fa-star"></i> <span data-i18n="favorites"></span>
     </button>
     <button class="menu-button" data-content="items" aria-pressed="false">
-      <i class="fas fa-box-open"></i> Itens
+      <i class="fas fa-box-open"></i> <span data-i18n="items"></span>
     </button>
     <button class="menu-button" data-content="workbenches" aria-pressed="false">
-      <i class="fas fa-hammer"></i> Bancadas
+      <i class="fas fa-hammer"></i> <span data-i18n="workbenches"></span>
     </button>
 
     <div class="language-selector">
@@ -493,14 +493,14 @@
     </div>
 
     <button class="theme-toggle" id="toggleTheme">
-      <i class="fas fa-moon"></i> <span>Tema Escuro</span>
+      <i class="fas fa-moon"></i> <span data-i18n="dark_theme"></span>
     </button>
   </div>
 
   <div class="main-content" id="main">
     <div class="loading">
       <i class="fas fa-spinner"></i>
-      <p>Carregando dados...</p>
+      <p data-i18n="loading_data"></p>
     </div>
   </div>
 
@@ -512,7 +512,6 @@
         items: [],
         workbenches: [],
         favorites: JSON.parse(localStorage.getItem('vrisingFavorites')) || [],
-        language: localStorage.getItem('vrisingLanguage') || 'pt',
         theme: localStorage.getItem('vrisingTheme') || 'light'
       },
       
@@ -566,11 +565,6 @@
         document.getElementById('toggleTheme').addEventListener('click', () => {
           this.toggleTheme();
         });
-        
-        // Idioma
-        document.getElementById('languageSelect').addEventListener('change', (e) => {
-          this.setLanguage(e.target.value);
-        });
       },
       
       // Aplicar configurações salvas
@@ -578,9 +572,6 @@
         // Tema
         document.documentElement.setAttribute('data-theme', this.data.theme);
         this.updateThemeButton();
-        
-        // Idioma
-        document.getElementById('languageSelect').value = this.data.language;
       },
       
       // Navegação
@@ -628,19 +619,12 @@
         
         if (this.data.theme === 'dark') {
           icon.className = 'fas fa-sun';
-          text.textContent = 'Tema Claro';
+          text.setAttribute('data-i18n', 'light_theme');
         } else {
           icon.className = 'fas fa-moon';
-          text.textContent = 'Tema Escuro';
+          text.setAttribute('data-i18n', 'dark_theme');
         }
-      },
-      
-      // Definir idioma
-      setLanguage(lang) {
-        this.data.language = lang;
-        localStorage.setItem('vrisingLanguage', lang);
-        // Aqui você implementaria a lógica de tradução
-        console.log('Idioma alterado para:', lang);
+        setLanguage(currentLang); // Atualiza o texto do botão
       },
       
       // Mostrar erro
@@ -652,62 +636,64 @@
             <div>${message}</div>
           </div>
           <button onclick="window.location.reload()">
-            <i class="fas fa-sync-alt"></i> Recarregar
+            <i class="fas fa-sync-alt"></i> <span data-i18n="reload"></span>
           </button>
         `;
+        setLanguage(currentLang);
       },
       
       // Páginas da aplicação
       showHome() {
         const main = document.getElementById('main');
         main.innerHTML = `
-          <h1>Bem-vindo</h1>
-          <p>Desenvolvida por dois fãs do jogo, esta é a V Crafting Calculator</p>
-          <p>Aviso: Esta ferramenta não é uma aplicação oficial da desenvolvedora Stunlock Studios, tampouco possui quaisquer fins comerciais. Seu propósito exclusivo é proporcionar auxílio à comunidade de jogadores do jogo V Rising.</p>
+          <h1 data-i18n="welcome"></h1>
+          <p data-i18n="description1"></p>
+          <p data-i18n="description2"></p>
           
           <div class="result-container">
-            <h2>Recursos disponíveis:</h2>
+            <h2 data-i18n="available_features"></h2>
             <ul class="materials-list">
-              <li><i class="fas fa-calculator"></i> Calculadora de materiais</li>
-              <li><i class="fas fa-star"></i> Lista de itens favoritos</li>
-              <li><i class="fas fa-box-open"></i> Catálogo completo de itens</li>
-              <li><i class="fas fa-hammer"></i> Informações sobre bancadas</li>
+              <li><i class="fas fa-calculator"></i> <span data-i18n="calculator"></span></li>
+              <li><i class="fas fa-star"></i> <span data-i18n="favorites"></span></li>
+              <li><i class="fas fa-box-open"></i> <span data-i18n="items"></span></li>
+              <li><i class="fas fa-hammer"></i> <span data-i18n="workbenches"></span></li>
             </ul>
           </div>
           
-          <h2>Dicas de uso</h2>
+          <h2 data-i18n="usage_tips"></h2>
           <div class="result-container">
             <ul class="materials-list">
-              <li>Altere o idioma no menu à esquerda</li>
-              <li>Use a calculadora para planejar suas construções</li>
-              <li>Adicione itens frequentes aos favoritos</li>
-              <li>Altere entre tema claro ou escuro no menu à esquerda</li>
+              <li data-i18n="tip1"></li>
+              <li data-i18n="tip2"></li>
+              <li data-i18n="tip3"></li>
+              <li data-i18n="tip4"></li>
             </ul>
           </div>
         `;
+        setLanguage(currentLang);
       },
       
       showCalculator() {
         const main = document.getElementById('main');
         main.innerHTML = `
-          <h1><i class="fas fa-calculator"></i> Calculadora de Crafting</h1>
+          <h1><i class="fas fa-calculator"></i> <span data-i18n="calculator_title"></span></h1>
           
           <div class="search-container">
-            <label for="itemSearch">Buscar item:</label>
+            <label for="itemSearch" data-i18n="search_item"></label>
             <input type="text" id="itemSearch" placeholder="Digite o nome do item..." autocomplete="off" />
             <ul id="suggestions" class="suggestions"></ul>
           </div>
           
-          <label for="quantityInput">Quantidade:</label>
+          <label for="quantityInput" data-i18n="quantity"></label>
           <input type="number" id="quantityInput" min="1" value="1" />
           
           <button id="calculateBtn" class="calculate-btn">
-            <i class="fas fa-calculator"></i> Calcular materiais
+            <i class="fas fa-calculator"></i> <span data-i18n="calculate_materials"></span>
           </button>
           
           <div id="result" class="result-container" style="display:none;"></div>
         `;
-        
+        setLanguage(currentLang);
         this.setupCalculator();
       },
       
@@ -727,13 +713,19 @@
           
           if (term.length < 2) {
             suggestions.style.display = 'none';
+            selectedItem = null; // Limpa o item selecionado quando a busca é limpa
             return;
           }
           
-          const filtered = this.data.items.filter(item => 
-            item.name.toLowerCase().includes(term) ||
-            (item.type && item.type.toLowerCase().includes(term))
-            ).slice(0, 10);
+          // Filtra os itens que correspondem ao termo de busca
+          const filtered = this.data.items.filter(item => {
+            // Verifica se o item tem nome e tipo definidos
+            if (!item.name || !item.type) return false;
+            
+            // Verifica se o termo de busca está no nome ou no tipo
+            return item.name.toLowerCase().includes(term) || 
+                  item.type.toLowerCase().includes(term);
+          }).slice(0, 10); // Limita a 10 resultados
           
           if (filtered.length > 0) {
             filtered.forEach(item => {
@@ -758,7 +750,7 @@
         
         // Fechar sugestões ao clicar fora
         document.addEventListener('click', (e) => {
-          if (!suggestions.contains(e.target) && e.target !== itemSearch) {
+          if (e.target !== itemSearch && !suggestions.contains(e.target)) {
             suggestions.style.display = 'none';
           }
         });
@@ -768,11 +760,24 @@
           const quantity = parseInt(quantityInput.value) || 1;
           
           if (!selectedItem) {
-            alert('Por favor, selecione um item da lista.');
+            // Usa o texto de tradução ou fallback em português
+            const errorMsg = document.querySelector('[data-i18n="select_item"]')?.textContent || 
+                            'Por favor, selecione um item da lista.';
+            alert(errorMsg);
             return;
           }
           
           this.showItemDetails(selectedItem, quantity);
+        });
+        
+        // Permite selecionar com teclado (Enter)
+        itemSearch.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && suggestions.style.display === 'block') {
+            const firstItem = suggestions.querySelector('li');
+            if (firstItem) {
+              firstItem.click();
+            }
+          }
         });
       },
       
@@ -809,9 +814,10 @@
             </div>
           </div>
           
-          <h3><i class="fas fa-box-open"></i> Materiais necessários:</h3>
+          <h3><i class="fas fa-box-open"></i> <span data-i18n="required_materials"></span>:</h3>
           ${this.renderMaterials(item.crafting?.materials || [], quantity)}
         `;
+        setLanguage(currentLang);
         
         // Adicionar evento ao botão de favorito
         result.querySelector('.favorite-btn').addEventListener('click', (e) => {
@@ -830,7 +836,7 @@
       
       renderMaterials(materials, quantity, depth = 0) {
         if (!materials || materials.length === 0) {
-          return '<p>Este item não requer materiais para crafting.</p>';
+          return '<p data-i18n="no_materials_required"></p>';
         }
 
         let html = '<ul class="materials-list">';
@@ -864,7 +870,7 @@
                         data-item="${matItem.id}" 
                         data-qty="${totalQty}" 
                         data-depth="${depth + 1}">
-                  <i class="fas fa-chevron-down"></i> Detalhes
+                  <i class="fas fa-chevron-down"></i> <span data-i18n="details"></span>
                 </button>
               ` : ''}
               <div id="${nestedId}" class="nested-materials" style="display:none;"></div>
@@ -880,7 +886,7 @@
         document.querySelectorAll('.expand-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const itemId = btn.getAttribute('data-item');
-            const qty = parseInt(btn.getAttribute('data-qty')) || 1; // Default para 1 se inválido
+            const qty = parseInt(btn.getAttribute('data-qty')) || 1;
             const depth = parseInt(btn.getAttribute('data-depth')) || 1;
             const targetDiv = document.getElementById(`nested-${itemId}-${depth - 1}`);
             const icon = btn.querySelector('i');
@@ -892,16 +898,18 @@
               targetDiv.style.display = 'block';
               targetDiv.innerHTML = this.renderMaterials(
                 item.crafting.materials, 
-                qty / (item.crafting.quantity || 1), // Evita divisão por zero
+                qty / (item.crafting.quantity || 1),
                 depth
               );
               icon.className = 'fas fa-chevron-up';
-              btn.innerHTML = `${icon.outerHTML} Ocultar`;
+              btn.innerHTML = `${icon.outerHTML} <span data-i18n="hide"></span>`;
               this.setupExpandButtons(); // Reconfigura os novos botões
+              setLanguage(currentLang);
             } else {
               targetDiv.style.display = 'none';
               icon.className = 'fas fa-chevron-down';
-              btn.innerHTML = `${icon.outerHTML} Detalhes`;
+              btn.innerHTML = `${icon.outerHTML} <span data-i18n="details"></span>`;
+              setLanguage(currentLang);
             }
           });
         });
@@ -929,17 +937,18 @@
         
         if (this.data.favorites.length === 0) {
           main.innerHTML = `
-            <h1><i class="fas fa-star"></i> Favoritos</h1>
+            <h1><i class="fas fa-star"></i> <span data-i18n="favorites"></span></h1>
             <div class="result-container">
-              <p>Você ainda não adicionou itens aos favoritos.</p>
-              <p>Use a calculadora e clique no ícone de estrela para adicionar itens aqui.</p>
+              <p data-i18n="no_favorites"></p>
+              <p data-i18n="add_favorites_instructions"></p>
             </div>
           `;
+          setLanguage(currentLang);
           return;
         }
         
         let html = `
-          <h1><i class="fas fa-star"></i> Favoritos</h1>
+          <h1><i class="fas fa-star"></i> <span data-i18n="favorites"></span></h1>
           <div class="result-container">
             <ul class="materials-list">
         `;
@@ -960,6 +969,7 @@
         `;
         
         main.innerHTML = html;
+        setLanguage(currentLang);
       },
       
       showFavoriteItem(itemId) {
@@ -976,9 +986,9 @@
       showItems() {
         const main = document.getElementById('main');
         let html = `
-          <h1><i class="fas fa-box-open"></i> Todos os Itens</h1>
+          <h1><i class="fas fa-box-open"></i> <span data-i18n="all_items"></span></h1>
           <div class="search-container">
-            <label for="itemsSearch">Filtrar itens:</label>
+            <label for="itemsSearch" data-i18n="filter_items"></label>
             <input type="text" id="itemsSearch" placeholder="Digite para filtrar..." />
           </div>
           
@@ -1021,6 +1031,7 @@
         `;
         
         main.innerHTML = html;
+        setLanguage(currentLang);
         
         // Configurar busca na lista de itens
         document.getElementById('itemsSearch').addEventListener('input', (e) => {
@@ -1046,7 +1057,7 @@
       showWorkbenches() {
         const main = document.getElementById('main');
         let html = `
-          <h1><i class="fas fa-hammer"></i> Bancadas de Trabalho</h1>
+          <h1><i class="fas fa-hammer"></i> <span data-i18n="workbenches_title"></span></h1>
           <div class="result-container">
             <ul class="materials-list">
         `;
@@ -1069,43 +1080,78 @@
         `;
         
         main.innerHTML = html;
+        setLanguage(currentLang);
       }
     };
-    
-    // Inicializar a aplicação quando o DOM estiver pronto
-    document.addEventListener('DOMContentLoaded', () => {
-      VrisingCalculator.init();
-      
-      // Adicionar ícones do Lucide (que usa Feather icons)
-      lucide.createIcons();
-    });
-    
-    // Expor funções para o escopo global (para eventos onclick em HTML)
-    window.VrisingCalculator = VrisingCalculator;
 
-    // 1) Traduções já definidas anteriormente
-    const translations = { /* ... seu objeto ... */ };
-    function translatePage(lang) { /* ... sua função ... */ }
+    // Variável que receberá o objeto completo do JSON
+    let translations = null;
 
-    // 2) Função para setar idioma e salvar preferência
-    function setLanguage(lang) {
-      document.documentElement.lang = lang;
-      localStorage.setItem('lang', lang);
-      translatePage(lang);
+    // 1) Define o idioma salvo ou usa 'pt-BR' como padrão
+    const savedLang = localStorage.getItem('lang') || 'pt-BR';
+    let currentLang = savedLang;
+
+    // 2) Função que percorre cada [data-i18n] e atribui innerText usando a chave completa
+    function setLanguage(langFull) {
+      if (!translations) return;
+
+      currentLang = langFull;
+      // Grava no localStorage para persistir a escolha
+      localStorage.setItem('lang', langFull);
+
+      // Ajusta o atributo <html lang="...">
+      document.documentElement.lang = langFull;
+
+      // Destaca o botão ativo (com data-lang exato)
       document.querySelectorAll('.language-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
+        btn.classList.toggle('active', btn.dataset.lang === langFull);
+      });
+
+      // Para cada elemento com data-i18n, procura translations[chave][langFull]
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (
+          translations.hasOwnProperty(key) &&
+          translations[key].hasOwnProperty(langFull)
+        ) {
+          el.innerText = translations[key][langFull];
+        } else {
+          console.warn(`Tradução não encontrada para "${key}" em "${langFull}"`);
+          el.innerText = '';
+        }
       });
     }
 
-    // 3) Gatilhos nos botões
+    // 3) Faz o fetch do lang.json ao iniciar
+    fetch('lang.json')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Não foi possível carregar lang.json: ' + res.status);
+        }
+        return res.json();
+      })
+      .then(jsonData => {
+        translations = jsonData;
+        // Assim que receber o JSON, aplica a tradução baseado no currentLang
+        setLanguage(currentLang);
+        // Inicializa a aplicação principal
+        VrisingCalculator.init();
+      })
+      .catch(err => {
+        console.error('Erro no fetch de lang.json:', err);
+        // Fallback: inicializa a aplicação mesmo sem traduções
+        VrisingCalculator.init();
+      });
+
+    // 4) Define clique nos botões para trocar o idioma
     document.querySelectorAll('.language-btn').forEach(btn => {
-      btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+      btn.addEventListener('click', () => {
+        const chosenLang = btn.dataset.lang;
+        if (chosenLang !== currentLang) {
+          setLanguage(chosenLang);
+        }
+      });
     });
-
-    // 4) Ao carregar, força pt-BR se não houver preferência
-    const initialLang = localStorage.getItem('lang') || 'pt-BR';
-    setLanguage(initialLang);
-
   </script>
 </body>
 </html>

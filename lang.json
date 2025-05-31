@@ -1,0 +1,130 @@
+{
+  "welcome": {
+    "pt-BR": "Bem-vindo",
+    "en-US": "Welcome"
+  },
+  "description1": {
+    "pt-BR": "Desenvolvida por dois fãs do jogo, esta é a V Crafting Calculator",
+    "en-US": "Developed by two fans of the game, this is the V Crafting Calculator"
+  },
+  "description2": {
+    "pt-BR": "Aviso: Esta ferramenta não é uma aplicação oficial da desenvolvedora Stunlock Studios, tampouco possui quaisquer fins comerciais. Seu propósito exclusivo é proporcionar auxílio à comunidade de jogadores do jogo V Rising.",
+    "en-US": "Disclaimer: This tool is not an official application of the developer Stunlock Studios, nor does it have any commercial purposes. Its sole purpose is to provide assistance to the V Rising player community."
+  },
+  "available_features": {
+    "pt-BR": "Recursos disponíveis:",
+    "en-US": "Available features:"
+  },
+  "calculator": {
+    "pt-BR": "Calculadora",
+    "en-US": "Calculator"
+  },
+  "favorites": {
+    "pt-BR": "Favoritos",
+    "en-US": "Favorites"
+  },
+  "items": {
+    "pt-BR": "Itens",
+    "en-US": "Items"
+  },
+  "workbenches": {
+    "pt-BR": "Bancadas",
+    "en-US": "Workbenches"
+  },
+  "usage_tips": {
+    "pt-BR": "Dicas de uso",
+    "en-US": "Usage tips"
+  },
+  "tip1": {
+    "pt-BR": "Altere o idioma no menu à esquerda",
+    "en-US": "Change the language in the left-hand menu"
+  },
+  "tip2": {
+    "pt-BR": "Use a calculadora para planejar suas construções",
+    "en-US": "Use the calculator to plan your builds"
+  },
+  "tip3": {
+    "pt-BR": "Adicione itens frequentes aos favoritos",
+    "en-US": "Add frequent items to your favorites"
+  },
+  "tip4": {
+    "pt-BR": "Altere entre tema claro ou escuro no menu à esquerda",
+    "en-US": "Toggle between light or dark theme in the left-hand menu"
+  },
+  "home": {
+    "pt-BR": "Início",
+    "en-US": "Home"
+  },
+  "dark_theme": {
+    "pt-BR": "Tema Escuro",
+    "en-US": "Dark Theme"
+  },
+  "light_theme": {
+    "pt-BR": "Tema Claro",
+    "en-US": "Light Theme"
+  },
+  "loading_data": {
+    "pt-BR": "Carregando dados...",
+    "en-US": "Loading data..."
+  },
+  "reload": {
+    "pt-BR": "Recarregar",
+    "en-US": "Reload"
+  },
+  "calculator_title": {
+    "pt-BR": "Calculadora de Crafting",
+    "en-US": "Crafting Calculator"
+  },
+  "search_item": {
+    "pt-BR": "Buscar item:",
+    "en-US": "Search item:"
+  },
+  "quantity": {
+    "pt-BR": "Quantidade:",
+    "en-US": "Quantity:"
+  },
+  "calculate_materials": {
+    "pt-BR": "Calcular materiais",
+    "en-US": "Calculate materials"
+  },
+  "required_materials": {
+    "pt-BR": "Materiais necessários",
+    "en-US": "Required materials"
+  },
+  "no_materials_required": {
+    "pt-BR": "Este item não requer materiais para crafting.",
+    "en-US": "This item does not require crafting materials."
+  },
+  "details": {
+    "pt-BR": "Detalhes",
+    "en-US": "Details"
+  },
+  "hide": {
+    "pt-BR": "Ocultar",
+    "en-US": "Hide"
+  },
+  "no_favorites": {
+    "pt-BR": "Você ainda não adicionou itens aos favoritos.",
+    "en-US": "You haven't added any items to favorites yet."
+  },
+  "add_favorites_instructions": {
+    "pt-BR": "Use a calculadora e clique no ícone de estrela para adicionar itens aqui.",
+    "en-US": "Use the calculator and click the star icon to add items here."
+  },
+  "all_items": {
+    "pt-BR": "Todos os Itens",
+    "en-US": "All Items"
+  },
+  "filter_items": {
+    "pt-BR": "Filtrar itens:",
+    "en-US": "Filter items:"
+  },
+  "workbenches_title": {
+    "pt-BR": "Bancadas de Trabalho",
+    "en-US": "Workbenches"
+  },
+  "select_item": {
+    "pt-BR": "Por favor, selecione um item da lista.",
+    "en-US": "Please select an item from the list."
+  }
+}
