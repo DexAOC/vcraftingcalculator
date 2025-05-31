@@ -1,0 +1,565 @@
+/*!
+ * Leaflet 1.9.3 Client-Side Library CSS
+ * https://leafletjs.com
+ * (c) 2010-2024 Vladimir Agafonkin, (c) 2010-2011 CloudMade
+ */
+
+/*-----------------------------------------------
+  1.0 - Basic page styles
+-------------------------------------------------*/
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane .leaflet-texture {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.leaflet-container {
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.leaflet-container a {
+  -webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+
+.leaflet-container.leaflet-touch a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.leaflet-container {
+  cursor: grab;
+}
+
+.leaflet-container:active {
+  cursor: grabbing;
+}
+
+/*-----------------------------------------------
+  2.0 - Base styles for map tiles and overlays
+-------------------------------------------------*/
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-pane .leaflet-texture,
+.leaflet-pane .leaflet-tile-container {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  pointer-events: none;
+}
+
+.leaflet-tile {
+  width: 256px;
+  height: 256px;
+  -webkit-transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+  transform-origin: 0 0;
+}
+
+.leaflet-tile-container {
+  z-index: 19;
+}
+
+.leaflet-pane .leaflet-marker-icon,
+.leaflet-pane .leaflet-marker-shadow,
+.leaflet-pane .leaflet-texture {
+  z-index: 20;
+}
+
+.leaflet-pane .leaflet-marker-shadow {
+  z-index: 19;
+}
+
+/*-----------------------------------------------
+  3.0 - Utilities for retina
+-------------------------------------------------*/
+.leaflet-retina .leaflet-pane .leaflet-tile {
+  image-rendering: crisp-edges;
+}
+
+.leaflet-retina .leaflet-tile-container {
+  z-index: 18;
+}
+
+/*-----------------------------------------------
+  4.0 - Base control classes
+-------------------------------------------------*/
+/* Control positioning */
+.leaflet-control {
+  position: relative;
+  z-index: 1000;
+  pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+  pointer-events: auto;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.leaflet-top {
+  top: 0;
+}
+.leaflet-bottom {
+  bottom: 0;
+}
+
+.leaflet-left {
+  left: 0;
+}
+.leaflet-right {
+  right: 0;
+}
+
+.leaflet-control {
+  float: left;
+  clear: both;
+}
+
+.leaflet-right .leaflet-control {
+  float: right;
+}
+
+/*-----------------------------------------------
+  5.0 - Control containers
+-------------------------------------------------*/
+.leaflet-top .leaflet-control {
+  margin-top: 10px;
+}
+.leaflet-left .leaflet-control {
+  margin-left: 10px;
+}
+.leaflet-bottom .leaflet-control {
+  margin-bottom: 10px;
+}
+.leaflet-right .leaflet-control {
+  margin-right: 10px;
+}
+
+.leaflet-control {
+  box-sizing: border-box;
+}
+
+/*-----------------------------------------------
+  6.0 - Default icon images
+-------------------------------------------------*/
+.leaflet-default-icon-path {
+  visibility: hidden;
+}
+
+/*-----------------------------------------------
+  7.0 - Marker/Icon
+-------------------------------------------------*/
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  display: block;
+  opacity: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.leaflet-hide-marker-pane .leaflet-marker-icon {
+  display: none;
+}
+
+.leaflet-zoom-animated .leaflet-marker-icon,
+.leaflet-zoom-animated .leaflet-marker-shadow {
+  -webkit-transform-origin: center bottom;
+  -ms-transform-origin: center bottom;
+  transform-origin: center bottom;
+}
+
+/*-----------------------------------------------
+  8.0 - Popup
+-------------------------------------------------*/
+.leaflet-popup {
+  position: absolute;
+  text-align: left;
+  pointer-events: auto;
+  width: auto;
+  max-width: 300px;
+  transform: translate3d(0, 0, 0);
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 1px;
+  text-align: left;
+  border-radius: 12px;
+  background: white;
+  color: #333;
+}
+
+.leaflet-popup-content {
+  margin: 13px 19px;
+  line-height: 1.4;
+}
+
+.leaflet-popup-content p {
+  margin: 18px 0;
+}
+
+.leaflet-popup-tip-container {
+  width: 40px;
+  height: 20px;
+  position: absolute;
+  left: 50%;
+  margin-left: -20px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.leaflet-popup-tip {
+  width: 17px;
+  height: 17px;
+  padding: 1px;
+  margin: -10px auto 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px;
+  color: #c3c3c3;
+  font: 16px/14px Tahoma, Verdana, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: bold;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #999;
+}
+
+.leaflet-popup-scrolled {
+  overflow: auto;
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+  zoom: 1;
+}
+
+.leaflet-oldie .leaflet-popup-tip {
+  width: 24px;
+  margin: 0 auto;
+  box-shadow: none;
+}
+.leaflet-oldie .leaflet-popup-tip-container {
+  margin-top: -1px;
+}
+
+/*-----------------------------------------------
+  9.0 - Tooltip
+-------------------------------------------------*/
+.leaflet-tooltip {
+  position: absolute;
+  padding: 6px 8px;
+  background: white;
+  border: 1px solid #ddd;
+  color: #333;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.leaflet-tooltip.leaflet-clickable {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  position: absolute;
+  pointer-events: none;
+  border: 6px solid transparent;
+  background: transparent;
+  content: '';
+}
+
+.leaflet-tooltip-left:before {
+  top: 50%;
+  right: -12px;
+  margin-top: -6px;
+  border-left-color: white;
+}
+
+.leaflet-tooltip-right:before {
+  top: 50%;
+  left: -12px;
+  margin-top: -6px;
+  border-right-color: white;
+}
+
+.leaflet-tooltip-top:before {
+  bottom: -12px;
+  left: 50%;
+  margin-left: -6px;
+  border-top-color: white;
+}
+
+.leaflet-tooltip-bottom:before {
+  top: -12px;
+  left: 50%;
+  margin-left: -6px;
+  border-bottom-color: white;
+}
+
+/*-----------------------------------------------
+  10.0 - Control.zoom (zoom buttons)
+-------------------------------------------------*/
+.leaflet-control-zoom {
+  position: relative;
+  width: 26px;
+  height: 58px;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.leaflet-control-zoom a {
+  display: block;
+  text-align: center;
+  background: #fff;
+  color: #333;
+  height: 28px;
+  line-height: 28px;
+  text-decoration: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 18px;
+  font-family: Tahoma, Verdana, sans-serif;
+  cursor: pointer;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #f4f4f4;
+  color: #111;
+}
+
+.leaflet-control-zoom a.leaflet-disabled {
+  cursor: default;
+  color: #bbb;
+}
+
+.leaflet-touch .leaflet-control-zoom a {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+}
+
+.leaflet-touch .leaflet-control-zoom {
+  width: 30px;
+  height: 60px;
+}
+
+/*-----------------------------------------------
+  11.0 - Control attribution
+-------------------------------------------------*/
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  color: #333;
+  font-size: 11px;
+  line-height: 18px;
+  padding: 0 5px;
+  border-radius: 0 0 0 0;
+}
+
+.leaflet-control-attribution,
+.leaflet-control-scale-line,
+.leaflet-container .leaflet-control-attribution {
+  pointer-events: none;
+}
+
+.leaflet-control-attribution a {
+  color: #0078A8;
+  text-decoration: none;
+}
+
+.leaflet-control-attribution a:hover {
+  text-decoration: underline;
+}
+
+/*-----------------------------------------------
+  12.0 - Control scale
+-------------------------------------------------*/
+.leaflet-control-scale { 
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  padding: 5px; 
+  font-size: 11px; 
+  background: rgba(255, 255, 255, 0.8); 
+  color: #333; 
+  line-height: 20px; 
+  white-space: nowrap; 
+  -webkit-user-select: none; 
+  -moz-user-select: none; 
+  -ms-user-select: none; 
+  user-select: none; 
+  pointer-events: none; 
+}
+
+.leaflet-control-scale-line { 
+  border: 2px solid #777; 
+  border-top: none; 
+  line-height: 1.1; 
+  padding: 2px 5px; 
+  background: #fff; 
+  white-space: nowrap; 
+}
+
+.leaflet-control-scale-line:not(:first-child) { 
+  border-top: 2px solid #777; 
+  border-bottom: none; 
+  margin-top: -2px; 
+}
+
+.leaflet-control-scale-line.leaflet-control-scale-line-first { 
+  border-bottom: none; 
+}
+
+/*-----------------------------------------------
+  13.0 - L.TileLayer.DOM (deprecated)
+-------------------------------------------------*/
+.leaflet-tile-loaded {
+  opacity: 1;
+  -webkit-transition: opacity 0.2s linear;
+  -moz-transition: opacity 0.2s linear;
+  -o-transition: opacity 0.2s linear;
+  transition: opacity 0.2s linear;
+}
+
+.leaflet-tile {
+  opacity: 0;
+}
+
+/*-----------------------------------------------
+  15.0 - Layer group and path (SVG)
+-------------------------------------------------*/
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  z-index: 400;
+}
+
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-marker-shadow-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/*-----------------------------------------------
+  16.0 - Path elements (SVG/Canvas/Padding)
+-------------------------------------------------*/
+.leaflet-zoom-animated .leaflet-zoom-animated {
+  -webkit-transform-origin: center center;
+      -ms-transform-origin: center center;
+          transform-origin: center center;
+}
+
+.leaflet-pane > svg,
+.leaflet-pane > canvas {
+  -webkit-transform: translate3d(0,0,0);
+      -ms-transform: translate3d(0,0,0);
+          transform: translate3d(0,0,0);
+}
+
+.leaflet-pane svg path {
+  stroke-linejoin: round;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+  touch-action: none;
+}
+
+.leaflet-container.leaflet-touch-drag {
+  touch-action: none;
+}
+
+/*-----------------------------------------------
+  17.0 - Layer group (Canvas)
+-------------------------------------------------*/
+.leaflet-zoom-hide {
+  visibility: hidden;
+}
+
+/*-----------------------------------------------
+  18.0 - Popups when open are on top
+-------------------------------------------------*/
+.leaflet-container .leaflet-popup-pane .leaflet-popup {
+  z-index: 800;
+}
+
+/*-----------------------------------------------
+  19.0 - Prevent selection and dragging (corrigido)
+-------------------------------------------------*/
+.leaflet-container,
+.leaflet-control {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  pointer-events: none;
+}
+
+.leaflet-container .leaflet-control {
+  pointer-events: auto;
+}
+
+.leaflet-container .leaflet-tooltip-pane,
+.leaflet-container .leaflet-marker-pane {
+  pointer-events: auto;
+}
+
+/*-----------------------------------------------
+  20.0 - Icons (default)
+-------------------------------------------------*/
+.leaflet-default-icon-path {
+  display: none;
+}
+
+/*-----------------------------------------------
+  21.0 - Fullscreen Control (if used)
+-------------------------------------------------*/
+.leaflet-control-fullscreen {
+  background: white;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+.leaflet-control-fullscreen:focus {
+  outline: none;
+}
