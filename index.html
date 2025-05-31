@@ -911,7 +911,10 @@
 
       // 6) Carrega a imagem de fundo. Como index.html e “imagens/” estão no mesmo nível,
       //    use exatamente este caminho:
-      L.imageOverlay("imagens/mapa.png", bounds).addTo(leafletMap);
+      L.imageOverlay(
+      "https://raw.githubusercontent.com/DexAOC/vcraftingcalculator/main/imagens/mapa.png",
+      bounds
+      ).addTo(leafletMap);
 
       leafletMap.fitBounds(bounds);
       leafletMap.setMaxBounds(bounds);
