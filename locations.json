@@ -1,0 +1,29 @@
+[
+  {
+    "itemId": "madeira",
+    "itemName": "Madeira",
+    "locations": [
+      { "x": 1200, "y": 900 },
+      { "x": 2500, "y": 1800 },
+      { "x": 4300, "y": 500 }
+    ]
+  },
+  {
+    "itemId": "fibra_vegetal",
+    "itemName": "Fibra Vegetal",
+    "locations": [
+      { "x": 800,  "y": 300 },
+      { "x": 1600, "y": 700 },
+      { "x": 2000, "y": 1500 }
+    ]
+  },
+  {
+    "itemId": "qualquer_flor",
+    "itemName": "Qualquer Flor",
+    "locations": [
+      { "x": 500,  "y": 250 },
+      { "x": 1000, "y": 1200 },
+      { "x": 2800, "y": 2000 }
+    ]
+  }
+]
