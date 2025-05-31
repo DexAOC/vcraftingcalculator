@@ -817,3 +817,47 @@ ul.suggestions li .item-type {
     font-size: 0.85rem;
   }
 }
+/* ================================
+   1) Garantir que nada “vaze” na horizontal
+   ================================ */
+html, body {
+  margin: 0;
+  padding: 0;
+  /* Faz com que qualquer overflow horizontal seja escondido */
+  overflow-x: hidden;
+}
+
+/* Aplica BOX-SIZING em todos os elementos para evitar cálculos inesperados de width/padding */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ================================
+   2) Ajustes específicos para mobile
+   ================================ */
+@media (max-width: 768px) {
+  /* A garantia extra para o container principal não extrapolar */
+  .content-wrapper,
+  .main-content {
+    width: 100%;
+    padding-right: 0;
+    margin-right: 0;
+  }
+
+  /* Se houver algum result-container com padding lateral, podemos reduzir para encaixar melhor */
+  .result-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Reforce que nenhum elemento direto de .result ou .hero extrapole 100% */
+  .hero,
+  .sub-hero-section,
+  .materials-list,
+  .materials-list li,
+  .materials-list img {
+    max-width: 100%;
+  }
+}
