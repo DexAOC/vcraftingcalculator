@@ -861,3 +861,52 @@ html, body {
     max-width: 100%;
   }
 }
+/* ===============================
+   Responsividade do Footer Mobile
+   =============================== */
+@media (max-width: 768px) {
+  /* Faz com que o footer inteiro ocupe 100% da largura e empilhe colunas */
+  .main-footer {
+    display: flex;
+    flex-direction: column; /* colunas uma sob a outra */
+    align-items: flex-start;/* alinha conteúdo à esquerda */
+    gap: 24px;              /* espaçamento entre as colunas */
+    padding: 24px 12px;     /* padding interno menor para caber no mobile */
+    box-sizing: border-box; /* garante que padding não aumente o width */
+    width: 100%;            /* total da largura visível */
+    margin: 0 auto;         /* centraliza caso haja max-width */
+  }
+
+  /* Cada coluna do footer passa a ter 100% de largura e margin-bottom */
+  .footer-col {
+    flex: 1 1 100%;        /* ocupa 100% da “linha” */
+    margin: 0;             /* remove margens laterais */
+    margin-bottom: 16px;   /* espaço abaixo de cada coluna */
+    width: 100%;           /* garante 100% do pai */
+  }
+
+  /* Ajusta tamanhos de fonte para não “esticarem” */
+  .footer-col h4 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .footer-col p,
+  .footer-col ul,
+  .footer-col a {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  /* Diminuir espaço interno das listas do footer (Links) */
+  .footer-col ul {
+    padding-left: 0;
+    list-style: none;
+  }
+  .footer-col ul li {
+    margin-bottom: 8px;
+  }
+  .footer-col ul li a {
+    display: inline-block;
+    width: auto;
+  }
+}
