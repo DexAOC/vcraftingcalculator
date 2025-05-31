@@ -861,31 +861,47 @@ html, body {
     max-width: 100%;
   }
 }
-/* ===============================
-   Responsividade do Footer Mobile
-   =============================== */
+/* ────────────────────────────────────────────────
+   Ajustes finais para que o Footer caiba no Mobile
+   ──────────────────────────────────────────────── */
+
+/* 1) Impedir overflow horizontal geral */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Garante que nada “vaze” pela lateral */
+}
+
+/* 2) Box-sizing universal para evitar cálculos errados de largura */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 3) Media query para telas menores que 768px */
 @media (max-width: 768px) {
-  /* Faz com que o footer inteiro ocupe 100% da largura e empilhe colunas */
+  /* 3.1) Faz o footer ocupar 100% e empilha as colunas */
   .main-footer {
-    display: flex;
-    flex-direction: column; /* colunas uma sob a outra */
-    align-items: flex-start;/* alinha conteúdo à esquerda */
-    gap: 24px;              /* espaçamento entre as colunas */
-    padding: 24px 12px;     /* padding interno menor para caber no mobile */
-    box-sizing: border-box; /* garante que padding não aumente o width */
-    width: 100%;            /* total da largura visível */
-    margin: 0 auto;         /* centraliza caso haja max-width */
+    display: flex !important;            /* Garante flex container */
+    flex-direction: column !important;   /* Colunas empilhadas */
+    align-items: flex-start;             /* Conteúdo alinhado à esquerda */
+    gap: 16px;                           /* Espaçamento entre colunas */
+    padding: 16px 12px !important;       /* Padding interno reduzido */
+    width: 100vw !important;             /* Força 100% da viewport */
+    margin: 0 auto !important;           /* Centraliza, caso haja max-width */
+    border-radius: 0 !important;         /* Remove arredondamento se necessário */
   }
 
-  /* Cada coluna do footer passa a ter 100% de largura e margin-bottom */
+  /* 3.2) Cada coluna agora ocupa 100% da largura sem margens laterais */
   .footer-col {
-    flex: 1 1 100%;        /* ocupa 100% da “linha” */
-    margin: 0;             /* remove margens laterais */
-    margin-bottom: 16px;   /* espaço abaixo de cada coluna */
-    width: 100%;           /* garante 100% do pai */
+    width: 100% !important;              /* Garante largura total do pai */
+    flex: 1 1 auto !important;           /* Ajusta flex para ocupar linha completa */
+    margin: 0 !important;                /* Remove margens que empurrem para a direita */
+    padding: 0 !important;               /* Remove padding lateral extra */
   }
 
-  /* Ajusta tamanhos de fonte para não “esticarem” */
+  /* 3.3) Ajuste de títulos e textos para não extrapolar */
   .footer-col h4 {
     font-size: 1rem;
     margin-bottom: 8px;
@@ -893,20 +909,36 @@ html, body {
   .footer-col p,
   .footer-col ul,
   .footer-col a {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     line-height: 1.4;
+    margin: 0;                           /* Remove qualquer margem extra */
+    padding: 0;                          /* Remove padding inesperado */
+    word-break: break-word;              /* Quebra texto muito longo */
   }
 
-  /* Diminuir espaço interno das listas do footer (Links) */
+  /* 3.4) Listas de links sem recuo */
   .footer-col ul {
-    padding-left: 0;
     list-style: none;
+    padding-left: 0;
+    margin: 0 0 8px 0;
   }
   .footer-col ul li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;                  /* Espaçamento vertical entre itens */
   }
-  .footer-col ul li a {
-    display: inline-block;
-    width: auto;
+
+  /* 3.5) Garante que neither .content-inner nem .content-wrapper cause overflow */
+  .content-wrapper,
+  .content-inner {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 3.6) Ajuste de padding interno dos containers de conteúdo */
+  .main-content,
+  .result-container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 }
+
