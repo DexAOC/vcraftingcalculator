@@ -1,592 +1,283 @@
-<!DOCTYPE html>
+js<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-  <link rel="manifest" href="icons/site.webmanifest">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AOC-CraftingCalc</title>
+  <title>VCraftingCalculator</title>
+
+  <!-- ============================= -->
+  <!-- 1) Leaflet CSS & JS (mapa)    -->
+  <!-- ============================= -->
+  <!-- O leaflet.css aqui pode apontar para seu arquivo local ou CDN. -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- ============================= -->
+  <!-- 2) CSS principal do projeto   -->
+  <!-- ============================= -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ============================= -->
+  <!-- 3) Font Awesome para ícones    -->
+  <!-- ============================= -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <!-- ============================= -->
+  <!-- 4) Lucide (opcional)           -->
+  <!-- ============================= -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #f4f4f4;
-      --text: #2c3e50;
-      --sidebar: #2c3e50;
-      --button: #34495e;
-      --hover: #1abc9c;
-      --active: #16a085;
-      --detail-bg: #fff;
-      --detail-text: #222;
-      --border: #ddd;
-      --error: #e74c3c;
-      --success: #2ecc71;
-      --warning: #f39c12;
-    }
-    [data-theme="dark"] {
-      --bg: #121212;
-      --text: #eee;
-      --sidebar: #222;
-      --button: #333;
-      --hover: #3498db;
-      --active: #2980b9;
-      --detail-bg: #222;
-      --detail-text: #eee;
-      --border: #444;
-      --error: #c0392b;
-      --success: #27ae60;
-      --warning: #d35400;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      min-height: 100vh;
-      background-color: var(--bg);
-      color: var(--text);
-      transition: background-color 0.3s, color 0.3s;
-      line-height: 1.6;
-    }
-
-    .sidebar {
-      width: 250px;
-      background-color: var(--sidebar);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border-right: 1px solid var(--border);
-    }
-    .sidebar h2 {
-      color: white;
-      font-size: 20px;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .sidebar h2 i {
-      font-size: 24px;
-    }
-    .menu-button {
-      padding: 12px 15px;
-      font-size: 16px;
-      color: white;
-      background-color: var(--button);
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all 0.3s ease;
-      text-align: left;
-    }
-    .menu-button:hover {
-      background-color: var(--hover);
-      transform: translateX(5px);
-    }
-    .menu-button[aria-pressed="true"] {
-      background-color: var(--active);
-      font-weight: 500;
-    }
-    .menu-button i {
-      width: 20px;
-      text-align: center;
-    }
-
-    .main-content {
-      flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    .main-content h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
-      color: var(--hover);
-    }
-    .main-content h2 {
-      font-size: 24px;
-      margin: 20px 0 15px;
-      color: var(--hover);
-    }
-
-    .search-container {
-      position: relative;
-      max-width: 400px;
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin: 15px 0 8px;
-      font-weight: 500;
-      color: var(--hover);
-    }
-    select, input[type="number"], input[type="text"] {
-      padding: 10px 12px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 400px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background-color: var(--detail-bg);
-      color: var(--detail-text);
-      transition: border-color 0.3s;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--hover);
-      box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.2);
-    }
-    ul.suggestions {
-      max-width: 400px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--detail-bg);
-      position: absolute;
-      z-index: 10;
-      width: 100%;
-      max-height: 300px;
-      overflow-y: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    ul.suggestions li {
-      padding: 10px 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: background-color 0.2s;
-    }
-    ul.suggestions li:hover {
-      background-color: var(--hover);
-      color: white;
-    }
-    ul.suggestions li img {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-      border-radius: 4px;
-    }
-    ul.suggestions li .item-type {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-left: auto;
-    }
-
-    button {
-      background-color: var(--button);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    button:hover {
-      background-color: var(--hover);
-      transform: translateY(-2px);
-    }
-    button:active {
-      transform: translateY(0);
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    button i {
-      font-size: 14px;
-    }
-
-    .result-container {
-      margin-top: 30px;
-      background: var(--detail-bg);
-      color: var(--detail-text);
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      border: 1px solid var(--border);
-    }
-    .result-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 20px;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .item-image {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background-color: rgba(0,0,0,0.05);
-      padding: 5px;
-    }
-    .item-info {
-      flex: 1;
-    }
-    .item-info h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-    .item-meta {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-    .item-meta span {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .item-meta i {
-      font-size: 14px;
-      opacity: 0.7;
-    }
-    .item-description {
-      font-style: italic;
-      opacity: 0.9;
-      margin-bottom: 10px;
-    }
-    .materials-list {
-      list-style: none;
-      padding-left: 0;
-    }
-    .materials-list li {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      background-color: rgba(0,0,0,0.05);
-    }
-    .materials-list li img {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-      border-radius: 4px;
-    }
-    .expand-btn {
-      background: none;
-      border: none;
-      color: var(--hover);
-      cursor: pointer;
-      padding: 2px 6px;
-      margin-left: 10px;
-      font-size: 14px;
-    }
-    .nested-materials {
-      margin-left: 30px;
-      margin-top: 10px;
-      padding-left: 15px;
-      border-left: 2px solid var(--hover);
-    }
-
-    .theme-toggle {
-      margin-top: auto;
-      padding: 12px;
-      background: var(--button);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .theme-toggle:hover {
-      background-color: var(--hover);
-    }
-
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      min-height: 200px;
-    }
-    .loading i {
-      font-size: 40px;
-      animation: spin 1s linear infinite;
-      color: var(--hover);
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .error-message {
-      color: var(--error);
-      background-color: rgba(231, 76, 60, 0.1);
-      padding: 15px;
-      border-radius: 8px;
-      margin: 20px 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .error-message i {
-      font-size: 20px;
-    }
-
-    .favorite-btn {
-      background: none;
-      border: none;
-      color: var(--warning);
-      cursor: pointer;
-      font-size: 18px;
-      margin-left: 10px;
-    }
-    .favorite-btn.active {
-      color: gold;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 15px;
-        gap: 8px;
-      }
-      .sidebar h2 {
-        width: 100%;
-        margin-bottom: 15px;
-      }
-      .menu-button, .theme-toggle {
-        flex: 1 1 calc(50% - 8px);
-        font-size: 14px;
-        padding: 10px;
-        gap: 8px;
-      }
-      .menu-button i {
-        font-size: 16px;
-      }
-      .main-content {
-        padding: 20px;
-      }
-      .result-header {
-        flex-direction: column;
-      }
-      .item-image {
-        align-self: center;
-      }
-    }
-
-    /* Tooltip styles */
-    [data-tooltip] {
-      position: relative;
-    }
-    [data-tooltip]::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-      white-space: nowrap;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s;
-      z-index: 100;
-    }
-    [data-tooltip]:hover::after {
-      opacity: 1;
-      visibility: visible;
-      bottom: calc(100% + 5px);
-    }
-    .language-selector {
-      display: flex;
-      justify-content: center;
-      margin: 1rem 0;
-      gap: 0.5rem;
-    }
-
-    .language-btn {
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-      padding: 4px 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background-color: var(--detail-bg);
-      color: var(--detail-text);
-      cursor: pointer;
-      transition: background-color 0.2s, border-color 0.2s;
-    }
-
-    .language-btn img {
-      width: 18px;
-      height: auto;
-      margin-right: 6px;
-    }
-
-    /* ─── AQUI ─── coloque as regras de active e hover depois das anteriores ─── */
-    .language-btn.active {
-      background-color: #1abc9c !important;
-      color: #ffffff !important;
-      border-color: #16a085 !important;
-    }
-
-    .language-btn:hover {
-      background-color: #16a085;
-      color: #ffffff;
-    }
-  </style>
 </head>
 <body>
-
+  <!-- ============================ -->
+  <!--       1) Sidebar Fixa        -->
+  <!-- ============================ -->
   <div class="sidebar">
-    <h2><i class="fas fa-calculator"></i> VCraftingCalculator</h2>
-    <button class="menu-button" data-content="home" aria-pressed="true">
-      <i class="fas fa-home"></i> <span data-i18n="home"></span>
-    </button>
-    <button class="menu-button" data-content="calculator" aria-pressed="false">
-      <i class="fas fa-calculator"></i> <span data-i18n="calculator"></span>
-    </button>
-    <button class="menu-button" data-content="favorites" aria-pressed="false">
-      <i class="fas fa-star"></i> <span data-i18n="favorites"></span>
-    </button>
-    <button class="menu-button" data-content="items" aria-pressed="false">
-      <i class="fas fa-box-open"></i> <span data-i18n="items"></span>
-    </button>
-    <button class="menu-button" data-content="workbenches" aria-pressed="false">
-      <i class="fas fa-hammer"></i> <span data-i18n="workbenches"></span>
-    </button>
+    <!-- Home -->
+    <a href="#" class="menu-item active" data-content="home" data-tooltip="Início">
+      <i class="fas fa-home"></i>
+      <span class="tooltip">Início</span>
+    </a>
 
+    <!-- Calculadora -->
+    <a href="#" class="menu-item" data-content="calculator" data-tooltip="Calculadora">
+      <i class="fas fa-calculator"></i>
+      <span class="tooltip">Calculadora</span>
+    </a>
+
+    <!-- Favoritos -->
+    <a href="#" class="menu-item" data-content="favorites" data-tooltip="Favoritos">
+      <i class="fas fa-star"></i>
+      <span class="tooltip">Favoritos</span>
+    </a>
+
+    <!-- Itens -->
+    <a href="#" class="menu-item" data-content="items" data-tooltip="Itens">
+      <i class="fas fa-box-open"></i>
+      <span class="tooltip">Itens</span>
+    </a>
+
+    <!-- Bancadas / Workbenches -->
+    <a href="#" class="menu-item" data-content="workbenches" data-tooltip="Bancadas">
+      <i class="fas fa-hammer"></i>
+      <span class="tooltip">Bancadas</span>
+    </a>
+
+    <!-- Espaço flexível (empurra seleção de idioma e tema para baixo) -->
+    <div style="flex: 1;"></div>
+
+    <!-- Seleção de Idioma -->
     <div class="language-selector">
       <button class="language-btn" data-lang="pt-BR">
-        <img src="https://flagcdn.com/24x18/br.png" alt="🇧🇷"> pt-BR
+        <img src="https://flagcdn.com/24x18/br.png" alt="🇧🇷" /> pt-BR
       </button>
       <button class="language-btn" data-lang="en-US">
-        <img src="https://flagcdn.com/24x18/us.png" alt="🇺🇸"> en-US
+        <img src="https://flagcdn.com/24x18/us.png" alt="🇺🇸" /> en-US
       </button>
     </div>
 
-    <button class="theme-toggle" id="toggleTheme">
-      <i class="fas fa-moon"></i> <span data-i18n="dark_theme"></span>
+    <!-- Alternar Tema -->
+    <button class="theme-toggle" id="toggleTheme" data-tooltip="Alternar Tema">
+      <i class="fas fa-moon"></i>
     </button>
   </div>
+  <!-- ========== Fim Sidebar ========== -->
 
-  <div class="main-content" id="main">
-    <div class="loading">
-      <i class="fas fa-spinner"></i>
-      <p data-i18n="loading_data"></p>
+  <!-- ============================ -->
+  <!-- 2) Conteúdo Principal Wrapper -->
+  <!-- ============================ -->
+  <div class="content-wrapper">
+    <div class="content-inner">
+      <!-- Área dinâmica onde o JS injeta cada tela: home, calculadora, favoritos, itens, bancadas -->
+      <div class="main-content" id="main">
+        <div class="loading">
+          <i class="fas fa-spinner"></i>
+          <p data-i18n="loading_data"></p>
+        </div>
+      </div>
+
+      <!-- ============================ -->
+      <!-- 3) Footer (Sobre / Links / Contato) -->
+      <!-- ============================ -->
+      <footer class="main-footer">
+        <div class="footer-col">
+          <h4>Sobre</h4>
+          <p>VCraftingCalculator é uma ferramenta criada por 2 fãs do jogo e que tem por objetivo ajudar a comunidade. V1.0.0</p>
+        </div>
+        <div class="footer-col">
+          <h4>Links</h4>
+          <ul>
+            <li>
+              <a href="#" onclick="VrisingCalculator.navigateTo('home'); return false;">
+                Início
+              </a>
+            </li>
+            <li>
+              <a href="#" onclick="VrisingCalculator.navigateTo('calculator'); return false;">
+                Calculadora
+              </a>
+            </li>
+            <li>
+              <a href="#" onclick="VrisingCalculator.navigateTo('favorites'); return false;">
+                Favoritos
+              </a>
+            </li>
+            <li>
+              <a href="#" onclick="VrisingCalculator.navigateTo('items'); return false;">
+                Itens
+              </a>
+            </li>
+            <li>
+              <a href="#" onclick="VrisingCalculator.navigateTo('workbenches'); return false;">
+                Bancadas
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <p>ianhezg23@gmail.com</p>
+          <p>+55 (16) 99765-7191</p>
+        </div>
+      </footer>
+      <!-- ========== Fim Footer ========== -->
     </div>
   </div>
+  <!-- ========== Fim Conteúdo Principal ========== -->
 
+  <!-- ============================ -->
+  <!-- 4) Script Principal (JS da aplicação) -->
+  <!-- ============================ -->
   <script>
-    // Aplicação principal
     const VrisingCalculator = {
-      // Dados da aplicação
+      // =========================
+      //  4.1) Dados Iniciais
+      // =========================
       data: {
         items: [],
         workbenches: [],
         favorites: JSON.parse(localStorage.getItem('vrisingFavorites')) || [],
         theme: localStorage.getItem('vrisingTheme') || 'light'
       },
-      
-      // Inicialização
+
+      // =========================
+      //  4.2) Localizações de cada recurso (coletável)
+      //       Carregado de locations.json
+      // =========================
+      resourceData: [],
+
+      // =========================
+      //  4.3) Inicialização
+      // =========================
       init() {
         this.loadData();
         this.setupEventListeners();
         this.applySettings();
+
+        // 4.3.1) Carrega locations.json tão logo o app inicialize
+        fetch('locations.json')
+          .then(res => res.json())
+          .then(data => {
+            this.resourceData = data;
+          })
+          .catch(err => console.error('Erro ao carregar locations.json:', err));
+
+        // 4.3.2) Simula clique em “home” para exibir a tela inicial
+        document.querySelector('.menu-item[data-content="home"]').click();
       },
-      
-      // Carregar dados
+
+      // =========================
+      //  4.4) Carrega items.json e workbenches.json
+      // =========================
       async loadData() {
         try {
-          const [itemsResponse, workbenchesResponse] = await Promise.all([
+          const [itemsRes, workbenchesRes] = await Promise.all([
             fetch('items.json'),
             fetch('workbenches.json')
           ]);
-          
-          if (!itemsResponse.ok || !workbenchesResponse.ok) {
-            throw new Error('Erro ao carregar dados');
+          if (!itemsRes.ok || !workbenchesRes.ok) {
+            throw new Error('Erro ao carregar JSON de itens ou bancadas');
           }
-          
           const [itemsData, workbenchesData] = await Promise.all([
-            itemsResponse.json(),
-            workbenchesResponse.json()
+            itemsRes.json(),
+            workbenchesRes.json()
           ]);
-          
           this.data.items = itemsData.items || [];
           this.data.workbenches = workbenchesData.workbenches || [];
-          
-          // Mostrar página inicial
           this.showHome();
-          
-        } catch (error) {
-          console.error('Erro ao carregar dados:', error);
-          this.showError('Erro ao carregar os dados. Por favor, tente recarregar a página.');
+        } catch (err) {
+          console.error(err);
+          this.showError('Erro ao carregar os dados. Recarregue a página.');
         }
       },
-      
-      // Configurar event listeners
+
+      // =========================
+      //  4.5) Listeners Fixos (sidebar, tema, idioma)
+      // =========================
       setupEventListeners() {
-        // Botões do menu
-        document.querySelectorAll('.menu-button').forEach(btn => {
+        // Navegação sidebar
+        document.querySelectorAll('.menu-item').forEach(btn => {
           btn.addEventListener('click', () => {
             const content = btn.getAttribute('data-content');
             this.navigateTo(content);
           });
         });
-        
-        // Tema
+        // Alternar Tema
         document.getElementById('toggleTheme').addEventListener('click', () => {
           this.toggleTheme();
         });
+        // Seleção de Idioma
+        document.querySelectorAll('.language-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            if (lang !== currentLang) {
+              setLanguage(lang);
+            }
+          });
+        });
       },
-      
-      // Aplicar configurações salvas
+
+      // =========================
+      //  4.6) Aplica Tema Salvo no LocalStorage
+      // =========================
       applySettings() {
-        // Tema
         document.documentElement.setAttribute('data-theme', this.data.theme);
         this.updateThemeButton();
       },
-      
-      // Navegação
+      updateThemeButton() {
+        const themeBtn = document.getElementById('toggleTheme');
+        const icon = themeBtn.querySelector('i');
+        if (this.data.theme === 'dark') {
+          icon.className = 'fas fa-sun';
+        } else {
+          icon.className = 'fas fa-moon';
+        }
+      },
+      toggleTheme() {
+        this.data.theme = this.data.theme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', this.data.theme);
+        localStorage.setItem('vrisingTheme', this.data.theme);
+        this.updateThemeButton();
+      },
+
+      // =========================
+      //  4.7) Navegar entre Páginas (home, calculator, favorites, items, workbenches)
+      // =========================
       navigateTo(page) {
-        // Atualizar botões ativos
-        document.querySelectorAll('.menu-button').forEach(btn => {
-          btn.setAttribute('aria-pressed', btn.getAttribute('data-content') === page);
+        // Ajusta a classe "active" na sidebar
+        document.querySelectorAll('.menu-item').forEach(btn => {
+          btn.classList.toggle(
+            'active',
+            btn.getAttribute('data-content') === page
+          );
         });
-        
-        // Mostrar página correspondente
-        switch(page) {
+
+        // Exibe a tela correta
+        switch (page) {
           case 'home':
             this.showHome();
             break;
@@ -606,32 +297,10 @@
             this.showHome();
         }
       },
-      
-      // Alternar tema
-      toggleTheme() {
-        this.data.theme = this.data.theme === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', this.data.theme);
-        localStorage.setItem('vrisingTheme', this.data.theme);
-        this.updateThemeButton();
-      },
-      
-      // Atualizar botão de tema
-      updateThemeButton() {
-        const themeBtn = document.getElementById('toggleTheme');
-        const icon = themeBtn.querySelector('i');
-        const text = themeBtn.querySelector('span');
-        
-        if (this.data.theme === 'dark') {
-          icon.className = 'fas fa-sun';
-          text.setAttribute('data-i18n', 'light_theme');
-        } else {
-          icon.className = 'fas fa-moon';
-          text.setAttribute('data-i18n', 'dark_theme');
-        }
-        setLanguage(currentLang); // Atualiza o texto do botão
-      },
-      
-      // Mostrar erro
+
+      // =========================
+      //  4.8) Mensagem de Erro Genérica
+      // =========================
       showError(message) {
         const main = document.getElementById('main');
         main.innerHTML = `
@@ -640,32 +309,74 @@
             <div>${message}</div>
           </div>
           <button onclick="window.location.reload()">
-            <i class="fas fa-sync-alt"></i> <span data-i18n="reload"></span>
+            <i class="fas fa-sync-alt"></i> Recarregar
           </button>
         `;
-        setLanguage(currentLang);
       },
-      
-      // Páginas da aplicação
+
+      // =========================
+      //  4.9) Home (Tela Inicial)
+      // =========================
       showHome() {
         const main = document.getElementById('main');
         main.innerHTML = `
-          <h1 data-i18n="welcome"></h1>
-          <p data-i18n="description1"></p>
-          <p data-i18n="description2"></p>
-          
+          <div class="hero">
+            <h1 data-i18n="welcome"></h1>
+            <p data-i18n="description1"></p>
+            <p data-i18n="description2"></p>
+          </div>
+
+          <div class="sub-hero-section">
+            <div class="sub-hero-card">
+              <!-- ícone removido -->
+              <h3 data-i18n="calculator"></h3>
+              <p>Use a calculadora para planejar seus itens.</p>
+              <button class="btn" onclick="VrisingCalculator.navigateTo('calculator')">
+                <span data-i18n="calculator"></span>
+              </button>
+            </div>
+            <div class="sub-hero-card">
+              <!-- ícone removido -->
+              <h3 data-i18n="favorites"></h3>
+              <p>Veja e gerencie seus favoritos.</p>
+              <button class="btn" onclick="VrisingCalculator.navigateTo('favorites')">
+                <span data-i18n="favorites"></span>
+              </button>
+            </div>
+            <div class="sub-hero-card">
+              <!-- ícone removido -->
+              <h3 data-i18n="items"></h3>
+              <p>Explore todos os itens disponíveis.</p>
+              <button class="btn" onclick="VrisingCalculator.navigateTo('items')">
+                <span data-i18n="items"></span>
+              </button>
+            </div>
+            <div class="sub-hero-card">
+              <!-- ícone removido -->
+              <h3 data-i18n="workbenches_title"></h3>
+              <p>Descubra as bancadas e suas funções.</p>
+              <button class="btn" onclick="VrisingCalculator.navigateTo('workbenches')">
+                <span data-i18n="workbenches_title"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ========================= -->
+          <!--   NOVA SEÇÃO “ATUALIZAÇÕES”   -->
+          <!-- ========================= -->
           <div class="result-container">
-            <h2 data-i18n="available_features"></h2>
+            <h2>Atualizações</h2>
             <ul class="materials-list">
-              <li><i class="fas fa-calculator"></i> <span data-i18n="calculator"></span></li>
-              <li><i class="fas fa-star"></i> <span data-i18n="favorites"></span></li>
-              <li><i class="fas fa-box-open"></i> <span data-i18n="items"></span></li>
-              <li><i class="fas fa-hammer"></i> <span data-i18n="workbenches"></span></li>
+              <li>• Versão 1.0.0 (xx/xx/2025): Lançamento inicial do site com xxxx.</li>
+              <!-- Adicione mais linhas conforme novas versões -->
             </ul>
           </div>
-          
-          <h2 data-i18n="usage_tips"></h2>
+
+          <!-- ========================= -->
+          <!--     DICAS DE USO (mantido)   -->
+          <!-- ========================= -->
           <div class="result-container">
+            <h2 data-i18n="usage_tips"></h2>
             <ul class="materials-list">
               <li data-i18n="tip1"></li>
               <li data-i18n="tip2"></li>
@@ -676,187 +387,207 @@
         `;
         setLanguage(currentLang);
       },
-      
+
+      // =========================
+      //  4.10) Calculadora       |
+      // =========================
       showCalculator() {
         const main = document.getElementById('main');
         main.innerHTML = `
-          <h1><i class="fas fa-calculator"></i> <span data-i18n="calculator_title"></span></h1>
-          
+          <div class="hero">
+            <h1><i class="fas fa-calculator"></i> <span data-i18n="calculator_title"></span></h1>
+            <p>Use esta seção para calcular materiais necessários.</p>
+          </div>
+
           <div class="search-container">
             <label for="itemSearch" data-i18n="search_item"></label>
             <input type="text" id="itemSearch" placeholder="Digite o nome do item..." autocomplete="off" />
             <ul id="suggestions" class="suggestions"></ul>
           </div>
-          
+
           <label for="quantityInput" data-i18n="quantity"></label>
           <input type="number" id="quantityInput" min="1" value="1" />
-          
-          <button id="calculateBtn" class="calculate-btn">
+
+          <button id="calculateBtn" class="btn">
             <i class="fas fa-calculator"></i> <span data-i18n="calculate_materials"></span>
           </button>
-          
+
           <div id="result" class="result-container" style="display:none;"></div>
         `;
         setLanguage(currentLang);
         this.setupCalculator();
       },
-      
+
       setupCalculator() {
-        const itemSearch = document.getElementById('itemSearch');
-        const suggestions = document.getElementById('suggestions');
-        const quantityInput = document.getElementById('quantityInput');
-        const calculateBtn = document.getElementById('calculateBtn');
-        const result = document.getElementById('result');
-        
+        const itemSearch = document.getElementById("itemSearch");
+        const suggestions = document.getElementById("suggestions");
+        const quantityInput = document.getElementById("quantityInput");
+        const calculateBtn = document.getElementById("calculateBtn");
+        const result = document.getElementById("result");
+
         let selectedItem = null;
-        
-        // Busca de itens
-        itemSearch.addEventListener('input', () => {
+
+        itemSearch.addEventListener("input", () => {
           const term = itemSearch.value.trim().toLowerCase();
-          suggestions.innerHTML = '';
-          
+          suggestions.innerHTML = "";
+
           if (term.length < 2) {
-            suggestions.style.display = 'none';
-            selectedItem = null; // Limpa o item selecionado quando a busca é limpa
+            suggestions.style.display = "none";
+            selectedItem = null;
             return;
           }
-          
-          // Filtra os itens que correspondem ao termo de busca
-          const filtered = this.data.items.filter(item => {
-            // Verifica se o item tem nome e tipo definidos
-            if (!item.name || !item.type) return false;
-            
-            // Verifica se o termo de busca está no nome ou no tipo
-            return item.name.toLowerCase().includes(term) || 
-                  item.type.toLowerCase().includes(term);
-          }).slice(0, 10); // Limita a 10 resultados
-          
+
+          const filtered = this.data.items
+            .filter(item => {
+              if (!item.name || !item.type) return false;
+              return (
+                item.name.toLowerCase().includes(term) ||
+                item.type.toLowerCase().includes(term)
+              );
+            })
+            .slice(0, 10);
+
           if (filtered.length > 0) {
             filtered.forEach(item => {
-              const li = document.createElement('li');
+              const li = document.createElement("li");
               li.innerHTML = `
-                <img src="${item.image || 'https://via.placeholder.com/24'}" alt="${item.name}" />
+                <img src="${item.image || "https://via.placeholder.com/24"}" alt="${item.name}" />
                 <span>${item.name}</span>
                 <span class="item-type">${item.type}</span>
               `;
-              li.addEventListener('click', () => {
+              li.addEventListener("click", () => {
                 selectedItem = item;
                 itemSearch.value = item.name;
-                suggestions.style.display = 'none';
+                suggestions.style.display = "none";
               });
               suggestions.appendChild(li);
             });
-            suggestions.style.display = 'block';
+            suggestions.style.display = "block";
           } else {
-            suggestions.style.display = 'none';
+            suggestions.style.display = "none";
           }
         });
-        
-        // Fechar sugestões ao clicar fora
-        document.addEventListener('click', (e) => {
+
+        document.addEventListener("click", e => {
           if (e.target !== itemSearch && !suggestions.contains(e.target)) {
-            suggestions.style.display = 'none';
+            suggestions.style.display = "none";
           }
         });
-        
-        // Calcular materiais
-        calculateBtn.addEventListener('click', () => {
+
+        calculateBtn.addEventListener("click", () => {
           const quantity = parseInt(quantityInput.value) || 1;
-          
+
           if (!selectedItem) {
-            // Usa o texto de tradução ou fallback em português
-            const errorMsg = document.querySelector('[data-i18n="select_item"]')?.textContent || 
-                            'Por favor, selecione um item da lista.';
+            const errorMsg =
+              document.querySelector('[data-i18n="select_item"]')
+                ?.textContent || "Por favor, selecione um item da lista.";
             alert(errorMsg);
             return;
           }
-          
+
           this.showItemDetails(selectedItem, quantity);
         });
-        
-        // Permite selecionar com teclado (Enter)
-        itemSearch.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' && suggestions.style.display === 'block') {
-            const firstItem = suggestions.querySelector('li');
+
+        itemSearch.addEventListener("keydown", e => {
+          if (e.key === "Enter" && suggestions.style.display === "block") {
+            const firstItem = suggestions.querySelector("li");
             if (firstItem) {
               firstItem.click();
             }
           }
         });
       },
-      
+
+      // =========================
+      //  4.11) Detalhes do Item  |
+      // =========================
       showItemDetails(item, quantity = 1) {
-        const result = document.getElementById('result');
-        result.style.display = 'block';
-        
-        // Verificar se é favorito
+        const result = document.getElementById("result");
+        result.style.display = "block";
+
         const isFavorite = this.data.favorites.some(fav => fav.id === item.id);
-        
+
         result.innerHTML = `
           <div class="result-header">
-            <img src="${item.image || 'https://via.placeholder.com/100?text=No+Image'}" 
-                 alt="${item.name}" 
-                 class="item-image"
-                 data-tooltip="${item.name}" />
-            
+            <img
+              src="${item.image || "https://via.placeholder.com/100?text=No+Image"}"
+              alt="${item.name}"
+              class="item-image"
+              data-tooltip="${item.name}"
+            />
+
             <div class="item-info">
               <h2>
                 ${item.name} (x${quantity})
-                <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
-                        data-id="${item.id}"
-                        data-tooltip="${isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                <button
+                  class="favorite-btn ${isFavorite ? "active" : ""}"
+                  data-id="${item.id}"
+                  data-tooltip="${isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}"
+                >
                   <i class="fas fa-star"></i>
+                  <span class="btn-text">
+                    ${isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                  </span>
                 </button>
               </h2>
-              
+
               <div class="item-meta">
-                ${item.type ? `<span><i class="fas fa-tag"></i> ${item.type}</span>` : ''}
-                ${item.origin ? `<span><i class="fas fa-map-marker-alt"></i> ${item.origin}</span>` : ''}
+                ${item.type ? `<span><i class="fas fa-tag"></i> ${item.type}</span>` : ""}
+                ${item.origin ? `<span><i class="fas fa-map-marker-alt"></i> ${item.origin}</span>` : ""}
               </div>
-              
-              ${item.description ? `<p class="item-description">${item.description}</p>` : ''}
+              ${item.description ? `<p class="item-description">${item.description}</p>` : ""}
             </div>
           </div>
-          
-          <h3><i class="fas fa-box-open"></i> <span data-i18n="required_materials"></span>:</h3>
+
+          <h2><i class="fas fa-box-open"></i> <span data-i18n="required_materials"></span>:</h2>
           ${this.renderMaterials(item.crafting?.materials || [], quantity)}
         `;
         setLanguage(currentLang);
-        
-        // Adicionar evento ao botão de favorito
-        result.querySelector('.favorite-btn').addEventListener('click', (e) => {
+
+        // Botão “Favorito” (mantido como antes)
+        const btnFav = result.querySelector(".favorite-btn");
+        btnFav.addEventListener("click", e => {
           this.toggleFavorite(item);
-          e.target.classList.toggle('active');
-          e.target.setAttribute('data-tooltip', 
-            e.target.classList.contains('active') ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
+          btnFav.classList.toggle("active");
+          const textoInterno = btnFav.querySelector(".btn-text");
+          if (btnFav.classList.contains("active")) {
+            textoInterno.textContent = "Remover dos favoritos";
+            btnFav.setAttribute("data-tooltip", "Remover dos favoritos");
+          } else {
+            textoInterno.textContent = "Adicionar aos favoritos";
+            btnFav.setAttribute("data-tooltip", "Adicionar aos favoritos");
+          }
         });
-        
-        // Adicionar eventos aos botões de expansão
+
+        // 4.11.1) Configura expande/colapsa para sub-ingredientes
         this.setupExpandButtons();
-        
-        // Rolagem suave para o resultado
-        result.scrollIntoView({ behavior: 'smooth' });
+
+        // 4.11.2) Configura clique em Botões “Mapa” para materiais coletáveis
+        this.setupMapButtons();
+
+        result.scrollIntoView({ behavior: "smooth" });
       },
-      
+
+      // =========================
+      //  4.12) Renderiza Materiais (com botões “Mapa” sempre que coletável)
+      // =========================
       renderMaterials(materials, quantity, depth = 0) {
         if (!materials || materials.length === 0) {
-          return '<p data-i18n="no_materials_required"></p>';
+          return `<p data-i18n="no_materials_required"></p>`;
         }
 
-        let html = '<ul class="materials-list">';
+        let html = `<ul class="materials-list">`;
 
         materials.forEach(mat => {
-          // Verificação robusta do item
           const matItem = this.data.items.find(i => i.id === mat.item);
           if (!matItem) {
             console.error(`Item não encontrado: ${mat.item}`);
-            return; // Pula este material se o item não existir
+            return;
           }
 
-          // Cálculo seguro da quantidade
           const matQuantity = Number(mat.quantity) || 0;
           const totalQty = Math.ceil(matQuantity * quantity);
-          
+
           if (isNaN(totalQty) || totalQty <= 0) {
             console.error(`Quantidade inválida para ${matItem.name}`);
             return;
@@ -867,62 +598,84 @@
 
           html += `
             <li>
-              <img src="${matItem.image || 'placeholder.png'}" alt="${matItem.name}" />
+              <img
+                src="${matItem.image || "https://via.placeholder.com/24"}"
+                alt="${matItem.name}"
+              />
               <span>${totalQty}x ${matItem.name}</span>
-              ${hasSub ? `
-                <button class="expand-btn" 
-                        data-item="${matItem.id}" 
-                        data-qty="${totalQty}" 
-                        data-depth="${depth + 1}">
-                  <i class="fas fa-chevron-down"></i> <span data-i18n="details"></span>
-                </button>
-              ` : ''}
+              ${hasSub
+                ? /* Se tiver sub-ingredientes, mantém o botão “Detalhes” */
+                  `<button
+                    class="expand-btn"
+                    data-item="${matItem.id}"
+                    data-qty="${totalQty}"
+                    data-depth="${depth + 1}"
+                  >
+                    <i class="fas fa-chevron-down"></i> <span data-i18n="details"></span>
+                  </button>`
+                : /* Caso contrário (é recurso coletável), exibe o botão “Mapa” */
+                  `<button
+                    class="map-btn"
+                    data-itemid="${matItem.id}"
+                    data-itemname="${matItem.name}"
+                  >
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Mapa</span>
+                  </button>`
+              }
               <div id="${nestedId}" class="nested-materials" style="display:none;"></div>
             </li>
           `;
         });
 
-        html += '</ul>';
+        html += `</ul>`;
         return html;
       },
-      
+
+      // =========================
+      //  4.13) Exibe / Oculta Sub-ingredientes
+      // =========================
       setupExpandButtons() {
-        document.querySelectorAll('.expand-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const itemId = btn.getAttribute('data-item');
-            const qty = parseInt(btn.getAttribute('data-qty')) || 1;
-            const depth = parseInt(btn.getAttribute('data-depth')) || 1;
-            const targetDiv = document.getElementById(`nested-${itemId}-${depth - 1}`);
-            const icon = btn.querySelector('i');
-            
+        document.querySelectorAll(".expand-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const itemId = btn.getAttribute("data-item");
+            const qty = parseInt(btn.getAttribute("data-qty")) || 1;
+            const depth = parseInt(btn.getAttribute("data-depth"));
+            const targetDiv = document.getElementById(
+              `nested-${itemId}-${depth - 1}`
+            );
+            const icon = btn.querySelector("i");
+
             const item = this.data.items.find(i => i.id === itemId);
             if (!targetDiv || !item?.crafting?.materials?.length) return;
-            
-            if (targetDiv.style.display === 'none') {
-              targetDiv.style.display = 'block';
+
+            if (targetDiv.style.display === "none") {
+              targetDiv.style.display = "block";
               targetDiv.innerHTML = this.renderMaterials(
-                item.crafting.materials, 
+                item.crafting.materials,
                 qty / (item.crafting.quantity || 1),
                 depth
               );
-              icon.className = 'fas fa-chevron-up';
+              icon.className = "fas fa-chevron-up";
               btn.innerHTML = `${icon.outerHTML} <span data-i18n="hide"></span>`;
-              this.setupExpandButtons(); // Reconfigura os novos botões
+              this.setupExpandButtons();
               setLanguage(currentLang);
             } else {
-              targetDiv.style.display = 'none';
-              icon.className = 'fas fa-chevron-down';
+              targetDiv.style.display = "none";
+              icon.className = "fas fa-chevron-down";
               btn.innerHTML = `${icon.outerHTML} <span data-i18n="details"></span>`;
               setLanguage(currentLang);
             }
           });
         });
       },
-      
+
+      // =========================
+      //  4.14) Favoritos         |
+      // =========================
       toggleFavorite(item) {
-        const index = this.data.favorites.findIndex(fav => fav.id === item.id);
-        
-        if (index === -1) {
+        const idx = this.data.favorites.findIndex(fav => fav.id === item.id);
+        if (idx === -1) {
           this.data.favorites.push({
             id: item.id,
             name: item.name,
@@ -930,77 +683,84 @@
             type: item.type
           });
         } else {
-          this.data.favorites.splice(index, 1);
+          this.data.favorites.splice(idx, 1);
         }
-        
-        localStorage.setItem('vrisingFavorites', JSON.stringify(this.data.favorites));
+        localStorage.setItem(
+          "vrisingFavorites",
+          JSON.stringify(this.data.favorites)
+        );
       },
-      
       showFavorites() {
-        const main = document.getElementById('main');
-        
+        const main = document.getElementById("main");
         if (this.data.favorites.length === 0) {
           main.innerHTML = `
-            <h1><i class="fas fa-star"></i> <span data-i18n="favorites"></span></h1>
+            <div class="hero">
+              <h1><i class="fas fa-star"></i> <span data-i18n="favorites"></span></h1>
+              <p>Você ainda não adicionou itens aos favoritos.</p>
+            </div>
             <div class="result-container">
-              <p data-i18n="no_favorites"></p>
               <p data-i18n="add_favorites_instructions"></p>
             </div>
           `;
           setLanguage(currentLang);
           return;
         }
-        
+
         let html = `
-          <h1><i class="fas fa-star"></i> <span data-i18n="favorites"></span></h1>
+          <div class="hero">
+            <h1><i class="fas fa-star"></i> <span data-i18n="favorites"></span></h1>
+            <p>Veja seus itens adicionados aos favoritos.</p>
+          </div>
           <div class="result-container">
             <ul class="materials-list">
         `;
-        
+
         this.data.favorites.forEach(item => {
           html += `
             <li onclick="VrisingCalculator.showFavoriteItem('${item.id}')" style="cursor:pointer;">
-              <img src="${item.image || 'https://via.placeholder.com/24'}" alt="${item.name}" />
+              <img src="${item.image || "https://via.placeholder.com/24"}" alt="${item.name}" />
               <span>${item.name}</span>
               <span class="item-type">${item.type}</span>
             </li>
           `;
         });
-        
+
         html += `
             </ul>
           </div>
         `;
-        
+
         main.innerHTML = html;
         setLanguage(currentLang);
       },
-      
       showFavoriteItem(itemId) {
         const item = this.data.items.find(i => i.id === itemId);
         if (!item) return;
-        
         this.showCalculator();
         setTimeout(() => {
-          document.getElementById('itemSearch').value = item.name;
+          document.getElementById("itemSearch").value = item.name;
           this.showItemDetails(item, 1);
         }, 100);
       },
-      
+
+      // =========================
+      //  4.15) Lista de Itens    |
+      // =========================
       showItems() {
-        const main = document.getElementById('main');
+        const main = document.getElementById("main");
         let html = `
-          <h1><i class="fas fa-box-open"></i> <span data-i18n="all_items"></span></h1>
+          <div class="hero">
+            <h1><i class="fas fa-box-open"></i> <span data-i18n="all_items"></span></h1>
+            <p>Liste e filtre todos os itens disponíveis.</p>
+          </div>
           <div class="search-container">
             <label for="itemsSearch" data-i18n="filter_items"></label>
             <input type="text" id="itemsSearch" placeholder="Digite para filtrar..." />
           </div>
-          
           <div class="result-container">
             <div id="itemsList" class="items-grid">
         `;
-        
-        // Agrupar itens por tipo
+
         const itemsByType = {};
         this.data.items.forEach(item => {
           if (!itemsByType[item.type]) {
@@ -1008,68 +768,68 @@
           }
           itemsByType[item.type].push(item);
         });
-        
-        // Adicionar itens ao HTML
+
         for (const [type, items] of Object.entries(itemsByType)) {
           html += `
-            <h3>${type}</h3>
+            <h2>${type}</h2>
             <ul class="materials-list">
           `;
-          
           items.forEach(item => {
             html += `
               <li onclick="VrisingCalculator.showItemDetailsFromList('${item.id}')" style="cursor:pointer;">
-                <img src="${item.image || 'https://via.placeholder.com/24'}" alt="${item.name}" />
+                <img src="${item.image || "https://via.placeholder.com/24"}" alt="${item.name}" />
                 <span>${item.name}</span>
-                <span class="item-type">${item.origin}</span>
+                <span class="item-type">${item.origin || ""}</span>
               </li>
             `;
           });
-          
           html += `</ul>`;
         }
-        
+
         html += `
             </div>
           </div>
         `;
-        
         main.innerHTML = html;
         setLanguage(currentLang);
-        
-        // Configurar busca na lista de itens
-        document.getElementById('itemsSearch').addEventListener('input', (e) => {
-          const term = e.target.value.toLowerCase();
-          document.querySelectorAll('#itemsList li').forEach(li => {
-            const text = li.textContent.toLowerCase();
-            li.style.display = text.includes(term) ? 'flex' : 'none';
+
+        document
+          .getElementById("itemsSearch")
+          .addEventListener("input", e => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll("#itemsList li").forEach(li => {
+              const text = li.textContent.toLowerCase();
+              li.style.display = text.includes(term) ? "flex" : "none";
+            });
           });
-        });
       },
-      
       showItemDetailsFromList(itemId) {
         const item = this.data.items.find(i => i.id === itemId);
         if (!item) return;
-        
         this.showCalculator();
         setTimeout(() => {
-          document.getElementById('itemSearch').value = item.name;
+          document.getElementById("itemSearch").value = item.name;
           this.showItemDetails(item, 1);
         }, 100);
       },
-      
+
+      // =========================
+      //  4.16) Bancadas (Workbenches)
+      // =========================
       showWorkbenches() {
-        const main = document.getElementById('main');
+        const main = document.getElementById("main");
         let html = `
-          <h1><i class="fas fa-hammer"></i> <span data-i18n="workbenches_title"></span></h1>
+          <div class="hero">
+            <h1><i class="fas fa-hammer"></i> <span data-i18n="workbenches_title"></span></h1>
+            <p>Confira as bancadas para crafting e sua descrição.</p>
+          </div>
           <div class="result-container">
             <ul class="materials-list">
         `;
-        
         this.data.workbenches.forEach(wb => {
           html += `
             <li>
-              <img src="${wb.image || 'https://via.placeholder.com/24'}" alt="${wb.name}" />
+              <img src="${wb.image || "https://via.placeholder.com/24"}" alt="${wb.name}" />
               <div>
                 <strong>${wb.name}</strong><br>
                 <small>${wb.description}</small>
@@ -1077,85 +837,139 @@
             </li>
           `;
         });
-        
         html += `
             </ul>
           </div>
         `;
-        
         main.innerHTML = html;
         setLanguage(currentLang);
+      },
+
+      // =========================
+      //  4.17) Configura Botões “Mapa” (resources)
+      // =========================
+      setupMapButtons() {
+        document.querySelectorAll('#result .map-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            console.log('Clique em Mapa detectado para itemId =', btn.getAttribute('data-itemid'));
+            const itemId   = btn.getAttribute('data-itemid');
+            const itemName = btn.getAttribute('data-itemname');
+            this.showMapForItem(itemId, itemName);
+          });
+        });
+      },
+
+      // =========================
+      //  4.18) Exibe / Oculta Mapa Leaflet para um recurso específico
+      // =========================
+      showMapForItem(itemId, itemName) {
+        // Se já existe <div id="map-container-<itemId>">, remova e saia (toggle)
+        const existing = document.getElementById(`map-container-${itemId}`);
+        if (existing) {
+          existing.remove();
+          return;
+        }
+
+        // 1) Cria novo contêiner <div id="map-container-<itemId>"> dentro de #result
+        const resultDiv = document.getElementById('result');
+        const mapDiv = document.createElement('div');
+        mapDiv.id = `map-container-${itemId}`;
+        mapDiv.style.width = '100%';
+        mapDiv.style.height = '300px';       // altura fixa; ajustável se quiser
+        mapDiv.style.marginTop = '16px';
+        mapDiv.style.border = '1px solid var(--border)';
+        mapDiv.style.borderRadius = '4px';
+        resultDiv.appendChild(mapDiv);
+
+        // 2) Procura as coordenadas em this.resourceData
+        const dataEntry = this.resourceData.find(r => r.itemId === itemId);
+        if (!dataEntry) {
+          mapDiv.innerHTML = `
+            <p style="padding:16px; color: var(--error)">
+              Nenhum dado de localização encontrado para "<strong>${itemName}</strong>".
+            </p>`;
+          return;
+        }
+
+        // 3) Inicializa Leaflet com CRS.Simple
+        //    Supondo que "imagens/mapa.png" tenha 6080×6080 px
+        const mapWidth  = 6080;
+        const mapHeight = 6080;
+
+        const leafletMap = L.map(mapDiv.id, {
+          crs: L.CRS.Simple,
+          minZoom: -2,
+          maxZoom: 2,
+          zoomSnap: 0.1
+        });
+
+        const bounds = [[0, 0], [mapHeight, mapWidth]];
+
+        // **AQUI FOI A MUDANÇA**: ajustamos o caminho para "imagens/mapa.png"
+        L.imageOverlay('imagens/mapa.png', bounds).addTo(leafletMap);
+
+        leafletMap.fitBounds(bounds);
+
+        // 4) Plota marcadores para cada local em dataEntry.locations
+        dataEntry.locations.forEach(loc => {
+          L.marker([loc.y, loc.x], {
+            title: itemName
+          })
+            .bindTooltip(itemName, {
+              direction: 'top',
+              offset: [0, -10],
+              permanent: false
+            })
+            .addTo(leafletMap);
+        });
       }
-    };
+    }
 
-    // Variável que receberá o objeto completo do JSON
+    // =========================
+    //  4.19) Traduções (i18n)
+    // =========================
     let translations = null;
-
-    // 1) Define o idioma salvo ou usa 'pt-BR' como padrão
-    const savedLang = localStorage.getItem('lang') || 'pt-BR';
+    const savedLang = localStorage.getItem("lang") || "pt-BR";
     let currentLang = savedLang;
 
-    // 2) Função que percorre cada [data-i18n] e atribui innerText usando a chave completa
     function setLanguage(langFull) {
       if (!translations) return;
-
       currentLang = langFull;
-      // Grava no localStorage para persistir a escolha
-      localStorage.setItem('lang', langFull);
-
-      // Ajusta o atributo <html lang="...">
+      localStorage.setItem("lang", langFull);
       document.documentElement.lang = langFull;
-
-      // Destaca o botão ativo (com data-lang exato)
-      document.querySelectorAll('.language-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === langFull);
+      document.querySelectorAll(".language-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === langFull);
       });
-
-      // Para cada elemento com data-i18n, procura translations[chave][langFull]
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
         if (
           translations.hasOwnProperty(key) &&
           translations[key].hasOwnProperty(langFull)
         ) {
           el.innerText = translations[key][langFull];
         } else {
-          console.warn(`Tradução não encontrada para "${key}" em "${langFull}"`);
-          el.innerText = '';
+          el.innerText = "";
         }
       });
     }
 
-    // 3) Faz o fetch do lang.json ao iniciar
-    fetch('lang.json')
+    // Carrega lang.json e inicia a aplicação
+    fetch("lang.json")
       .then(res => {
         if (!res.ok) {
-          throw new Error('Não foi possível carregar lang.json: ' + res.status);
+          throw new Error("Não foi possível carregar lang.json");
         }
         return res.json();
       })
       .then(jsonData => {
         translations = jsonData;
-        // Assim que receber o JSON, aplica a tradução baseado no currentLang
         setLanguage(currentLang);
-        // Inicializa a aplicação principal
         VrisingCalculator.init();
       })
       .catch(err => {
-        console.error('Erro no fetch de lang.json:', err);
-        // Fallback: inicializa a aplicação mesmo sem traduções
+        console.error(err);
         VrisingCalculator.init();
       });
-
-    // 4) Define clique nos botões para trocar o idioma
-    document.querySelectorAll('.language-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const chosenLang = btn.dataset.lang;
-        if (chosenLang !== currentLang) {
-          setLanguage(chosenLang);
-        }
-      });
-    });
   </script>
 </body>
 </html>
